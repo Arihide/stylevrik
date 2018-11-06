@@ -1,0 +1,11 @@
+useless
+*.o
+*.obj
+*.lib
+*.exe
+*.out
+*.pdb
+*.exp
+*.ilk
+.DS_Store
+*.dSYM
