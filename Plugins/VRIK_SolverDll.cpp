@@ -24,8 +24,9 @@ extern "C"
         return solver;
     }
 
-    EXPORT_API void SetParent(int seg, int parent)
+    EXPORT_API void SetMaxIterations(VRIKSolver *solver, int max_iterations)
     {
+        solver->param.max_iterations = max_iterations;
     }
 
     EXPORT_API void AddGoal(VRIKSolver *solver, float goal_x, float goal_y, float goal_z)
@@ -34,7 +35,6 @@ extern "C"
         Vector3d ggoal(goal_x, goal_y, goal_z);
 
         solver->gpconstraint.SetGlobalGoal(ggoal);
-
     }
 
     EXPORT_API void AddVelocityGoal(VRIKSolver *solver, float goal_x, float goal_y, float goal_z)

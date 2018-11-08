@@ -50,8 +50,8 @@ class GPConstraint
         tip = CreateSegment(15);  // RightForeArm
 
         // これやると勾配テストが通らない。。。長さが不ぞろいだとなにがまずい？->到達できない？
-        // root->m_translation = Vector3d(25.876, 0, 0);
-        // tip->m_translation = Vector3d(28.40199, 0, 0);
+        root->m_translation = Vector3d(25.876, 0, 0);
+        tip->m_translation = Vector3d(28.40199, 0, 0);
 
         tip->SetParent(root);
 
@@ -129,12 +129,7 @@ class GPConstraint
 
     void SetVelocityGoal(Vector3d &vgoal)
     {
-        vtask->m_goal = vgoal;
-    }
-
-    bool Setup()
-    {
-        return true;
+        // vtask->m_goal = vgoal;
     }
 
     bool UpdateSegment(IK_QSegment *seg, double x, double y, double z)
@@ -200,8 +195,6 @@ class GPConstraint
         task->ComputeExpMapJacobian(m_jacobian, x.segment(14 * 3, 6));
 
         Vector3d d_pos = task->m_goal - tip->GlobalEnd();
-
-        // 角速度の情報はⅹに含まれるが、どうやって速度を取り出すか->jacobian計算時についでに計算
 
         x_grad = VectorXd::Zero(m_gp.dim);
 

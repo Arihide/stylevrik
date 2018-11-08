@@ -16,6 +16,8 @@ public class AnimationAvator : MonoBehaviour
     public Transform RightHandTarget;
     public Transform HeadTarget;
 
+    public int max_iterations = 20;
+
     void Awake()
     {
 
@@ -23,6 +25,8 @@ public class AnimationAvator : MonoBehaviour
         animator = GetComponent<Animator>();
 
         solver = VRIKSolver.Create();
+
+        VRIKSolver.SetMaxIterations(solver, max_iterations);
 
     }
 
@@ -118,19 +122,10 @@ public class AnimationAvator : MonoBehaviour
         }
     }
 
-    // Quaternion GetReceivedRotation(NeuronBones neuronBones)
-    // {
-
-    //     return Quaternion.Euler(new Vector3(
-    //         VRIKSolver.GetEulerAngle(solver, (int)neuronBones + 1, 1),
-    //         -VRIKSolver.GetEulerAngle(solver, (int)neuronBones + 1, 0),
-    //         -VRIKSolver.GetEulerAngle(solver, (int)neuronBones + 1, 2)
-    //     ));
-
-    // }
-
     Quaternion GetReceivedRotation(NeuronBones neuronBones)
     {
+        // Log Quaternion
+
         Vector3 axis = new Vector3(
             VRIKSolver.GetEulerAngle(solver, (int)neuronBones + 0, 0),
             VRIKSolver.GetEulerAngle(solver, (int)neuronBones + 0, 1),
