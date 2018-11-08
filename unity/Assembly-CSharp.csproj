@@ -125,14 +125,7 @@
      <Compile Include="Assets\Script\Animation\Actor.cs" />
      <Compile Include="Assets\Script\AnimationAvator.cs" />
      <Compile Include="Assets\Script\ArrayExtensions.cs" />
-     <Compile Include="Assets\Script\DataReader.cs" />
-     <Compile Include="Assets\Script\FullbodyVRIKInstance.cs" />
-     <Compile Include="Assets\Script\Hoge.cs" />
-     <Compile Include="Assets\Script\TestUDPSender.cs" />
      <Compile Include="Assets\Script\TransformExtensions.cs" />
-     <Compile Include="Assets\Script\UDPReceive.cs" />
-     <Compile Include="Assets\Script\UDPReciever.cs" />
-     <Compile Include="Assets\Script\UDPTouchSender.cs" />
      <Compile Include="Assets\Script\VRIKSolver.cs" />
      <None Include="Assets\MagicMirror\Prefab\MirrorShaderOld.shader" />
      <None Include="Assets\Oculus\VR\Resources\OVRMRUnlitTransparent.shader" />
