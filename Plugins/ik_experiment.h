@@ -225,9 +225,6 @@ class IK
         obj += m_jacobian.m_beta.head(3).squaredNorm() * 0.5;
         obj += m_jacobian.m_beta.tail(3).squaredNorm() * 0.5;
 
-        cout << m_jacobian.m_jacobian << endl;
-        // cout << m_jacobian.m_beta << endl;
-
         return obj;
     }
 };

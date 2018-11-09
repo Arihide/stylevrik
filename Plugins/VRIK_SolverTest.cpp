@@ -113,7 +113,7 @@ int main()
     solver.minimize(gp, x, fx);
 
     // IKのテスト
-    // IK ik("skeleton1.json");
+    // IK ik("skeleton.json");
     IK ik;
     x.setZero(9);
     x_grad.setZero(9);
@@ -122,13 +122,11 @@ int main()
 
     // IK
     GPConstraint gpcontraint;
-    gpcontraint.Initialize("skeleton1.json", gp);
+    gpcontraint.Initialize("skeleton.json", gp);
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
     // assert(check_gradient(gpcontraint, x, x_grad));
     // solver.minimize(gpcontraint, x, fx);
-
-    // cout << x << endl;
 
     // gpcontraint(x, x_grad);
     // assert(check_gradient(gpconstraint, x, x_grad));

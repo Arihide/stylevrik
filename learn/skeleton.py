@@ -10,6 +10,7 @@ class Joint():
         self.global_transform = Matrix.Identity(4)
         self.parent = None
         self.children = []
+        self.name = None
 
     @property
     def translation(self):

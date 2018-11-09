@@ -11,6 +11,7 @@
 #include <fstream>
 #include <list>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -18,12 +19,18 @@ class GPConstraint
 {
   public:
     std::list<IK_QTask *> tasks;
-    IK_QJacobian m_jacobian;
-    IK_QSegment *root;
-    IK_QSegment *tip;
-    IK_QPositionTask *task;
-    IK_QVelocityTask *vtask;
-    std::vector<IK_QSegment *> m_segment;
+    IK_QJacobian m_rjacobian;
+    IK_QJacobian m_ljacobian;
+    IK_QSegment *rroot;
+    IK_QSegment *rtip;
+    IK_QSegment *lroot;
+    IK_QSegment *ltip;
+
+    IK_QPositionTask *rptask;
+    IK_QPositionTask *lptask;
+    IK_QVelocityTask *rvtask;
+    IK_QVelocityTask *lvtask;
+    std::map<int, IK_QSegment *> segment_map;
     Affine3d m_rootmatrix;
     double lambda;
 
@@ -46,90 +53,113 @@ class GPConstraint
         string err;
         skeleton = json11::Json::parse(json_str, err);
 
-        root = CreateSegment(14); // RightArm
-        tip = CreateSegment(15);  // RightForeArm
-
-        // これやると勾配テストが通らない。。。長さが不ぞろいだとなにがまずい？->到達できない？
-        root->m_translation = Vector3d(25.876, 0, 0);
-        tip->m_translation = Vector3d(28.40199, 0, 0);
-
-        tip->SetParent(root);
-
         m_rootmatrix.setIdentity();
 
-        root->SetDoFId(0);
-        tip->SetDoFId(3);
+        rroot = CreateSegment(14); // RightArm
+        rtip = CreateSegment(15);  // RightForeArm
 
-        root->UpdateTransform(m_rootmatrix);
+        SetSegmentTransform(rroot, 15);
+        SetSegmentTransform(rtip, 16);
 
-        // Vector3d ggoal(48, 161, 21);
+        segment_map[14] = rroot;
+        segment_map[15] = rtip;
+
+        // これやると勾配テストが通らない。。。長さが不ぞろいだとなにがまずい？->到達できない？
+        // rroot->m_translation = Vector3d(25.876, 0, 0);
+        // rtip->m_translation = Vector3d(28.40199, 0, 0);
+
+        rtip->SetParent(rroot);
+        rroot->SetDoFId(0);
+        rtip->SetDoFId(3);
+        rroot->UpdateTransform(m_rootmatrix);
 
         Vector3d goal(1, 1, 1);
         Vector3d vgoal(0, 0, 0);
-        // IK_QTask *ee = new IK_QPositionTask(true, tip, goal);
-        task = new IK_QPositionTask(true, tip, goal);
-        vtask = new IK_QVelocityTask(true, tip, vgoal);
+        // IK_QTask *ee = new IK_QPositionTask(true, rtip, goal);
+        rptask = new IK_QPositionTask(true, rtip, goal);
+        rvtask = new IK_QVelocityTask(true, rtip, vgoal);
 
-        task->SetId(0);
-        vtask->SetId(3);
+        rptask->SetId(0);
+        rvtask->SetId(3);
+
+        lroot = CreateSegment(37); //LeftArm
+        ltip = CreateSegment(38);  //LeftForeArm
+        SetSegmentTransform(lroot, 38);
+        SetSegmentTransform(ltip, 39);
+        ltip->SetParent(lroot);
+        lroot->SetDoFId(0);
+        ltip->SetDoFId(3);
+        lptask = new IK_QPositionTask(true, ltip, goal);
+        lvtask = new IK_QVelocityTask(true, ltip, goal);
+
+        lptask->SetId(0);
+        lvtask->SetId(3);
+
+        segment_map[37] = lroot;
+        segment_map[38] = ltip;
+
+        lroot->UpdateTransform(m_rootmatrix);
 
         // tasks.push_back(ee);
 
         // int primary_size = 0;
-        // for (task = tasks.begin(); task != tasks.end(); task++)
+        // for (rptask = tasks.begin(); rptask != tasks.end(); rptask++)
         // {
-        //     IK_QTask *qtask = *task;
+        //     IK_QTask *qtask = *rptask;
         //     qtask->SetId(primary_size);
         //     primary_size += qtask->Size();
         // }
 
         lambda = 1;
 
-        m_jacobian.ArmMatrices(6, 3);
+        m_rjacobian.ArmMatrices(6, 3);
+        m_ljacobian.ArmMatrices(6, 3);
     }
 
     IK_QSphericalSegment *CreateSegment(int id)
     {
         IK_QSphericalSegment *seg = new IK_QSphericalSegment();
 
-        auto &rest = skeleton["bones"].array_items()[id]["mat"].array_items();
-
-        Vector3d mstart = Vector3d::Zero();
-        // Matrix3d mrest = CreateMatrix(
-        //     rest[0].number_value(), rest[1].number_value(), rest[2].number_value(),
-        //     rest[3].number_value(), rest[4].number_value(), rest[5].number_value(),
-        //     rest[6].number_value(), rest[7].number_value(), rest[8].number_value());
-        Matrix3d mrest = CreateMatrix(
-            1, 0, 0, 0, 1, 0, 0, 0, 1);
-        Matrix3d mbasis = CreateMatrix(
-            1, 0, 0, 0, 1, 0, 0, 0, 1);
-
-        // リンクの長さが異なると収束しない。
-        double mlength = skeleton["bones"].array_items()[id]["length"].number_value();
-
-        seg->SetTransform(mstart, mbasis, mrest, mlength);
-
         return seg;
     }
 
-    void SetGlobalGoal(Vector3d &ggoal)
+    void SetSegmentTransform(IK_QSegment *seg, int id)
     {
 
-        Affine3d mat = Affine3d::Identity();
+        auto &translation = skeleton[id]["translation"].array_items();
 
-        // mat.matrix() << 1.0, 0.0, 0.0, 20.5538,
-        //     0.0, 1.0, 0.0, 160.0075,
-        //     0.0, 0.0, 1.0, -1.24851,
-        //     0.0, 0.0, 0.0, 1.0;
+        seg->m_translation = Vector3d(
+            translation[0].number_value(),
+            translation[1].number_value(),
+            translation[2].number_value());
+    }
 
-        mat.translation() << 20.5538, 160.075, -1.24851;
+    void SetRightGlobalGoal(Vector3d &ggoal)
+    {
+        // Affine3d mat = Affine3d::Identity();
+        // mat.translation() << 20.5538, 160.075, -1.24851;
+        // rptask->m_goal = mat.inverse() * ggoal;
 
-        task->m_goal = mat.inverse() * ggoal;
+        auto &gt = skeleton[14]["globalTranslation"].array_items();
+
+        rptask->m_goal(0) = ggoal(0) - gt[0].number_value();
+        rptask->m_goal(1) = ggoal(1) - gt[1].number_value();
+        rptask->m_goal(2) = ggoal(2) - gt[2].number_value();
+
+    }
+
+    void SetLeftGlobalGoal(Vector3d &ggoal)
+    {
+        auto &gt = skeleton[37]["globalTranslation"].array_items();
+
+        lptask->m_goal(0) = ggoal(0) - gt[0].number_value();
+        lptask->m_goal(1) = ggoal(1) - gt[1].number_value();
+        lptask->m_goal(2) = ggoal(2) - gt[2].number_value();
     }
 
     void SetVelocityGoal(Vector3d &vgoal)
     {
-        // vtask->m_goal = vgoal;
+        rvtask->m_goal = vgoal;
     }
 
     bool UpdateSegment(IK_QSegment *seg, double x, double y, double z)
@@ -180,30 +210,33 @@ class GPConstraint
     {
         double obj;
 
-        UpdateSegment(root, x(14 * 3 + 0), x(14 * 3 + 1), x(14 * 3 + 2));
-        UpdateSegment(tip, x(14 * 3 + 3), x(14 * 3 + 4), x(14 * 3 + 5));
+        for (auto i = segment_map.begin(); i != segment_map.end(); ++i)
+        {
+            UpdateSegment(i->second, x(i->first * 3 + 0), x(i->first * 3 + 1), x(i->first * 3 + 2));
+        }
 
-        root->UpdateTransform(m_rootmatrix);
-        // task->ComputeJacobian(m_jacobian);
+        rroot->UpdateTransform(m_rootmatrix);
+        lroot->UpdateTransform(m_rootmatrix);
+
         // std::list<IK_QTask *>::iterator task;
         // for (task = tasks.begin(); task != tasks.end(); task++)
         // {
-        //     (*task)->ComputeJacobian(m_jacobian);
+        //     (*task)->ComputeJacobian(m_rjacobian);
         // }
-        // m_jacobian.Invert();
 
-        task->ComputeExpMapJacobian(m_jacobian, x.segment(14 * 3, 6));
-
-        Vector3d d_pos = task->m_goal - tip->GlobalEnd();
+        rptask->ComputeExpMapJacobian(m_rjacobian, x.segment(14 * 3, 6));
+        lptask->ComputeExpMapJacobian(m_ljacobian, x.segment(37 * 3, 6));
 
         x_grad = VectorXd::Zero(m_gp.dim);
 
         // 目的関数とその勾配
         obj = m_gp(x, x_grad);
 
-        x_grad.segment(14 * 3, 6) += -m_jacobian.m_jacobian.transpose() * d_pos * lambda;
+        x_grad.segment(14 * 3, 6) += -m_rjacobian.m_jacobian.transpose() * m_rjacobian.m_beta * lambda;
+        x_grad.segment(37 * 3, 6) += -m_ljacobian.m_jacobian.transpose() * m_ljacobian.m_beta * lambda;
 
-        obj += d_pos.squaredNorm() * 0.5 * lambda;
+        obj += m_rjacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
+        obj += m_ljacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
 
         return obj;
     }

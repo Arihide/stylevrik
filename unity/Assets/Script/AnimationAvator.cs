@@ -16,6 +16,8 @@ public class AnimationAvator : MonoBehaviour
     public Transform RightHandTarget;
     public Transform HeadTarget;
 
+    public Transform Point;
+
     public int max_iterations = 20;
 
     void Awake()
@@ -32,11 +34,15 @@ public class AnimationAvator : MonoBehaviour
 
     void Update()
     {
-        Vector3 goal = RightHandTarget.position;
-        
-        VRIKSolver.AddGoal(solver, goal.x * 100, goal.y * 100, goal.z * 100);
+        Vector3 rgoal = RightHandTarget.position;
+        Vector3 lgoal = LeftHandTarget.position;
+
+        VRIKSolver.AddRightPositionGoal(solver, rgoal.x * 100, rgoal.y * 100, rgoal.z * 100);
+        VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, lgoal.y * 100, lgoal.z * 100);
 
         VRIKSolver.Solve(solver);
+
+        Point.position = new Vector3(VRIKSolver.GetLatentVariable(solver, 0), VRIKSolver.GetLatentVariable(solver, 1), 0);
 
         // legs
         SetRotation(animator, HumanBodyBones.RightUpperLeg, GetReceivedRotation(NeuronBones.RightUpLeg));
@@ -127,9 +133,9 @@ public class AnimationAvator : MonoBehaviour
         // Log Quaternion
 
         Vector3 axis = new Vector3(
-            VRIKSolver.GetEulerAngle(solver, (int)neuronBones + 0, 0),
-            VRIKSolver.GetEulerAngle(solver, (int)neuronBones + 0, 1),
-            VRIKSolver.GetEulerAngle(solver, (int)neuronBones + 0, 2)
+            VRIKSolver.GetAngle(solver, (int)neuronBones + 0, 0),
+            VRIKSolver.GetAngle(solver, (int)neuronBones + 0, 1),
+            VRIKSolver.GetAngle(solver, (int)neuronBones + 0, 2)
         );
 
         float angle = axis.magnitude;

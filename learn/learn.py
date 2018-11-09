@@ -77,15 +77,14 @@ def save_model(model):
 
 
 if __name__ == "__main__":
-    br = BVHReader('bvh/walk00.bvh')
+    br = BVHReader('bvh/walk01.bvh')
     br.read()
 
     # データの下処理
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
-    Y = motion_to_features(Y, True)
-    Y = np.hstack((Y, calculate_effector_velocity(16, br)))
-    Y = Y[::5]
+    # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
+    Y = Y[::4]
 
     # print(Y)
 

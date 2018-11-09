@@ -15,11 +15,12 @@ extern "C"
 
         solver->param.max_iterations = 30;
 
-        solver->gp.load("C:/Users/Takahashi/Desktop/VRAvater/Plugins/expmap_model_reduce.json");
+        // solver->gp.load("C:/Users/Takahashi/Desktop/VRAvater/Plugins/expmap_model_reduce.json");
+        solver->gp.load("C:/Users/Takahashi/Desktop/VRAvater/Plugins/walk01model.json");
         solver->m_x.resize(solver->gp.dim);
         solver->m_x.head(solver->gp.y_dim) = solver->gp.Y.row(6);
 
-        solver->gpconstraint.Initialize("C:/Users/Takahashi/Desktop/VRAvater/Plugins/skeleton1.json", solver->gp);
+        solver->gpconstraint.Initialize("C:/Users/Takahashi/Desktop/VRAvater/Plugins/skeleton.json", solver->gp);
 
         return solver;
     }
@@ -29,12 +30,19 @@ extern "C"
         solver->param.max_iterations = max_iterations;
     }
 
-    EXPORT_API void AddGoal(VRIKSolver *solver, float goal_x, float goal_y, float goal_z)
+    EXPORT_API void AddRightPositionGoal(VRIKSolver *solver, float goal_x, float goal_y, float goal_z)
     {
 
         Vector3d ggoal(goal_x, goal_y, goal_z);
 
-        solver->gpconstraint.SetGlobalGoal(ggoal);
+        solver->gpconstraint.SetRightGlobalGoal(ggoal);
+    }
+
+    EXPORT_API void AddLeftPositionGoal(VRIKSolver *solver, float goal_x, float goal_y, float goal_z)
+    {
+
+        Vector3d ggoal(goal_x, goal_y, goal_z);
+        solver->gpconstraint.SetLeftGlobalGoal(ggoal);
     }
 
     EXPORT_API void AddVelocityGoal(VRIKSolver *solver, float goal_x, float goal_y, float goal_z)
@@ -49,14 +57,19 @@ extern "C"
         solver->solver.minimize(solver->gpconstraint, solver->m_x, solver->m_fx);
     }
 
-    EXPORT_API float GetEulerAngle(VRIKSolver *solver, int boneIndex, int eulerIndex)
+    EXPORT_API float GetAngle(VRIKSolver *solver, int boneIndex, int eulerIndex)
     {
         return solver->m_x(boneIndex * 3 + eulerIndex);
     }
 
-    EXPORT_API float GetExampleEulerAngle(VRIKSolver *solver, int boneIndex, int eulerIndex)
+    EXPORT_API float GetExampleAngle(VRIKSolver *solver, int boneIndex, int eulerIndex)
     {
         return solver->gp.Y(0, boneIndex * 3 + eulerIndex);
+    }
+
+    EXPORT_API float GetLatentVariable(VRIKSolver *solver, int index)
+    {
+        return solver->m_x(solver->gp.y_dim + index);
     }
 
     EXPORT_API float GetLikelihood(VRIKSolver *solver)

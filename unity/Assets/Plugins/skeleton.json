@@ -1,0 +1,474 @@
+[
+ {
+  "name": "Hips",
+  "translation": [
+   -0.0,
+   105.8499984741211,
+   0.0
+  ]
+ },
+ {
+  "name": "RightUpLeg",
+  "translation": [
+   11.5,
+   -1.850000023841858,
+   0.0
+  ]
+ },
+ {
+  "name": "RightLeg",
+  "translation": [
+   -0.0,
+   -48.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightFoot",
+  "translation": [
+   -0.0,
+   -48.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftUpLeg",
+  "translation": [
+   -11.5,
+   -1.850000023841858,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftLeg",
+  "translation": [
+   -0.0,
+   -48.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftFoot",
+  "translation": [
+   -0.0,
+   -48.0,
+   0.0
+  ]
+ },
+ {
+  "name": "Spine",
+  "translation": [
+   -0.0,
+   16.65399932861328,
+   0.0
+  ]
+ },
+ {
+  "name": "Spine1",
+  "translation": [
+   -0.0,
+   11.312000274658203,
+   0.0
+  ]
+ },
+ {
+  "name": "Spine2",
+  "translation": [
+   -0.0,
+   11.779999732971191,
+   0.0
+  ]
+ },
+ {
+  "name": "Spine3",
+  "translation": [
+   -0.0,
+   11.312000274658203,
+   0.0
+  ]
+ },
+ {
+  "name": "Neck",
+  "translation": [
+   -0.0,
+   12.090999603271484,
+   0.0
+  ]
+ },
+ {
+  "name": "Head",
+  "translation": [
+   -0.0,
+   9.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightShoulder",
+  "translation": [
+   3.5,
+   8.060999870300293,
+   0.0
+  ]
+ },
+ {
+  "name": "RightArm",
+  "translation": [
+   14.0,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightForeArm",
+  "translation": [
+   29.0,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightHand",
+  "translation": [
+   28.0,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightHandThumb1",
+  "translation": [
+   2.7019999027252197,
+   0.20600000023841858,
+   3.388000011444092
+  ]
+ },
+ {
+  "name": "RightHandThumb2",
+  "translation": [
+   3.997999906539917,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightHandThumb3",
+  "translation": [
+   2.7780001163482666,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightInHandIndex",
+  "translation": [
+   3.5,
+   0.5519999861717224,
+   2.1480000019073486
+  ]
+ },
+ {
+  "name": "RightHandIndex1",
+  "translation": [
+   5.664000034332275,
+   -0.0989999994635582,
+   1.0850000381469727
+  ]
+ },
+ {
+  "name": "RightHandIndex2",
+  "translation": [
+   3.930000066757202,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightHandIndex3",
+  "translation": [
+   2.2279999256134033,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightInHandMiddle",
+  "translation": [
+   3.671999931335449,
+   0.5619999766349792,
+   0.8220000267028809
+  ]
+ },
+ {
+  "name": "RightHandMiddle1",
+  "translation": [
+   5.618000030517578,
+   -0.09099999815225601,
+   0.3409999907016754
+  ]
+ },
+ {
+  "name": "RightHandMiddle2",
+  "translation": [
+   4.288000106811523,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightHandMiddle3",
+  "translation": [
+   2.687999963760376,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightInHandRing",
+  "translation": [
+   3.6540000438690186,
+   0.5839999914169312,
+   -0.14000000059604645
+  ]
+ },
+ {
+  "name": "RightHandRing1",
+  "translation": [
+   5.0320000648498535,
+   -0.024000000208616257,
+   -0.5199999809265137
+  ]
+ },
+ {
+  "name": "RightHandRing2",
+  "translation": [
+   3.736999988555908,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightHandRing3",
+  "translation": [
+   2.5929999351501465,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightInHandPinky",
+  "translation": [
+   3.431999921798706,
+   0.5099999904632568,
+   -1.3049999475479126
+  ]
+ },
+ {
+  "name": "RightHandPinky1",
+  "translation": [
+   4.495999813079834,
+   -0.024000000208616257,
+   -1.184000015258789
+  ]
+ },
+ {
+  "name": "RightHandPinky2",
+  "translation": [
+   2.993000030517578,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "RightHandPinky3",
+  "translation": [
+   1.8910000324249268,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftShoulder",
+  "translation": [
+   -3.5,
+   8.060999870300293,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftArm",
+  "translation": [
+   -14.0,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftForeArm",
+  "translation": [
+   -29.0,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftHand",
+  "translation": [
+   -28.0,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftHandThumb1",
+  "translation": [
+   -2.7019999027252197,
+   0.20600000023841858,
+   3.388000011444092
+  ]
+ },
+ {
+  "name": "LeftHandThumb2",
+  "translation": [
+   -3.997999906539917,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftHandThumb3",
+  "translation": [
+   -2.7780001163482666,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftInHandIndex",
+  "translation": [
+   -3.5,
+   0.5519999861717224,
+   2.1480000019073486
+  ]
+ },
+ {
+  "name": "LeftHandIndex1",
+  "translation": [
+   -5.664000034332275,
+   -0.0989999994635582,
+   1.0850000381469727
+  ]
+ },
+ {
+  "name": "LeftHandIndex2",
+  "translation": [
+   -3.930000066757202,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftHandIndex3",
+  "translation": [
+   -2.2279999256134033,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftInHandMiddle",
+  "translation": [
+   -3.671999931335449,
+   0.5619999766349792,
+   0.8220000267028809
+  ]
+ },
+ {
+  "name": "LeftHandMiddle1",
+  "translation": [
+   -5.618000030517578,
+   -0.09099999815225601,
+   0.3409999907016754
+  ]
+ },
+ {
+  "name": "LeftHandMiddle2",
+  "translation": [
+   -4.288000106811523,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftHandMiddle3",
+  "translation": [
+   -2.687999963760376,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftInHandRing",
+  "translation": [
+   -3.6540000438690186,
+   0.5839999914169312,
+   -0.14000000059604645
+  ]
+ },
+ {
+  "name": "LeftHandRing1",
+  "translation": [
+   -5.0320000648498535,
+   -0.024000000208616257,
+   -0.5199999809265137
+  ]
+ },
+ {
+  "name": "LeftHandRing2",
+  "translation": [
+   -3.736999988555908,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftHandRing3",
+  "translation": [
+   -2.5929999351501465,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftInHandPinky",
+  "translation": [
+   -3.431999921798706,
+   0.5099999904632568,
+   -1.3049999475479126
+  ]
+ },
+ {
+  "name": "LeftHandPinky1",
+  "translation": [
+   -4.495999813079834,
+   -0.024000000208616257,
+   -1.184000015258789
+  ]
+ },
+ {
+  "name": "LeftHandPinky2",
+  "translation": [
+   -2.993000030517578,
+   0.0,
+   0.0
+  ]
+ },
+ {
+  "name": "LeftHandPinky3",
+  "translation": [
+   -1.8910000324249268,
+   0.0,
+   0.0
+  ]
+ }
+]

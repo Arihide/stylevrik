@@ -57,6 +57,7 @@
      <Compile Include="Assets\MagicMirror\Prefab\MirrorCameraScript.cs" />
      <Compile Include="Assets\MagicMirror\Prefab\MirrorReflectionScript.cs" />
      <Compile Include="Assets\MagicMirror\Prefab\MirrorScript.cs" />
+     <Compile Include="Assets\Mirror\MirrorReflection.cs" />
      <Compile Include="Assets\Neuron\Scripts\Mocap\NeuronActor.cs" />
      <Compile Include="Assets\Neuron\Scripts\Mocap\NeuronAnimatorInstance.cs" />
      <Compile Include="Assets\Neuron\Scripts\Mocap\NeuronAnimatorPhysicalReference.cs" />
@@ -125,6 +126,8 @@
      <Compile Include="Assets\Script\Animation\Actor.cs" />
      <Compile Include="Assets\Script\AnimationAvator.cs" />
      <Compile Include="Assets\Script\ArrayExtensions.cs" />
+     <Compile Include="Assets\Script\CopyPose.cs" />
+     <Compile Include="Assets\Script\LatentPosition.cs" />
      <Compile Include="Assets\Script\TransformExtensions.cs" />
      <Compile Include="Assets\Script\VRIKSolver.cs" />
      <None Include="Assets\MagicMirror\Prefab\MirrorShaderOld.shader" />
@@ -142,9 +145,11 @@
      <None Include="Assets\Oculus\VR\Resources\Underlay Transparent Occluder.shader" />
      <None Include="Assets\Oculus\VR\Resources\Texture2D Blit.shader" />
      <None Include="Assets\Oculus\VR\Resources\OVRMRCameraFrame.shader" />
+     <None Include="Assets\Mirror\Mirror.shader" />
      <None Include="Assets\Oculus\VR\Resources\OVRMRClipPlane.shader" />
      <None Include="Assets\MagicMirror\Prefab\MirrorShader.shader" />
      <None Include="Assets\Oculus\VR\Resources\Underlay Impostor.shader" />
+     <None Include="Assets\Mirror\Metal.shader" />
      <None Include="Assets\Oculus\VR\Plugins\placeholder.txt" />
  <Reference Include="UnityEditor.StandardEvents">
  <HintPath>C:/Users/Takahashi/Desktop/VRAvater/unity/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
