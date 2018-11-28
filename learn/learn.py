@@ -1,6 +1,8 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import GPy
+from scaled_gplvm import ScaledGPLVM
+
 GPy.plotting.change_plotting_library('plotly')
 # from bvh_reader import BVHReader
 from skeleton import BVHReader
@@ -83,16 +85,16 @@ if __name__ == "__main__":
     # データの下処理
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
-    # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
-    Y = Y[::4]
-
-    # print(Y)
+    Y = np.hstack((Y, calculate_effector_velocity(16, br)))
+    Y = Y[::5]
 
     kernel = GPy.kern.RBF(input_dim=2, lengthscale=None, ARD=False)
 
+    # model = ScaledGPLVM(Y, 2, kernel=kernel)
     model = GPy.models.GPLVM(Y, 2, kernel=kernel)
+    # model = GPy.models.BCGPLVM(Y, 2, kernel=kernel)
 
-    model.optimize(messages=1, max_iters=5e10)
+    model.optimize(messages=1, max_iters=5e20)
 
     figure = GPy.plotting.plotting_library().figure(1, 2,
                                                     shared_yaxes=True,

@@ -16,6 +16,9 @@ public class AnimationAvator : MonoBehaviour
     public Transform RightHandTarget;
     public Transform HeadTarget;
 
+    public string SkeletonPath = "C:/Users/Takahashi/Desktop/VRAvater/Plugins/skeleton.json";
+    public string GPModelPath = "C:/Users/Takahashi/Desktop/VRAvater/Plugins/expmap_model_reduce.json";
+
     public Transform Point;
 
     public int max_iterations = 20;
@@ -26,7 +29,9 @@ public class AnimationAvator : MonoBehaviour
         actor = GetComponent<Actor>();
         animator = GetComponent<Animator>();
 
-        solver = VRIKSolver.Create();
+        solver = VRIKSolver.Create(SkeletonPath, GPModelPath);
+
+        VRIKSolver.SetLambda(solver, 1f);
 
         VRIKSolver.SetMaxIterations(solver, max_iterations);
 

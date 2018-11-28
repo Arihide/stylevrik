@@ -157,9 +157,14 @@ class GPConstraint
         lptask->m_goal(2) = ggoal(2) - gt[2].number_value();
     }
 
-    void SetVelocityGoal(Vector3d &vgoal)
+    void SetRightVelocityGoal(Vector3d &vgoal)
     {
         rvtask->m_goal = vgoal;
+    }
+
+    void SetLeftVelocityGoal(Vector3d &vgoal)
+    {
+        lvtask->m_goal = vgoal;
     }
 
     bool UpdateSegment(IK_QSegment *seg, double x, double y, double z)

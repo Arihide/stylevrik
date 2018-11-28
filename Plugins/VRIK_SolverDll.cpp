@@ -9,18 +9,20 @@
 
 extern "C"
 {
-    EXPORT_API VRIKSolver *Create()
+    EXPORT_API VRIKSolver *Create(const char *skeleton, const char *gpmodel)
     {
         VRIKSolver *solver = new VRIKSolver();
 
         solver->param.max_iterations = 30;
 
         // solver->gp.load("C:/Users/Takahashi/Desktop/VRAvater/Plugins/expmap_model_reduce.json");
-        solver->gp.load("C:/Users/Takahashi/Desktop/VRAvater/Plugins/walk01model.json");
+        // solver->gp.load("C:/Users/Takahashi/Desktop/VRAvater/Plugins/walk01model.json");
+        solver->gp.load(gpmodel);
         solver->m_x.resize(solver->gp.dim);
         solver->m_x.head(solver->gp.y_dim) = solver->gp.Y.row(6);
 
-        solver->gpconstraint.Initialize("C:/Users/Takahashi/Desktop/VRAvater/Plugins/skeleton.json", solver->gp);
+        // solver->gpconstraint.Initialize("C:/Users/Takahashi/Desktop/VRAvater/Plugins/skeleton.json", solver->gp);
+        solver->gpconstraint.Initialize(skeleton, solver->gp);
 
         return solver;
     }
@@ -30,26 +32,33 @@ extern "C"
         solver->param.max_iterations = max_iterations;
     }
 
+    EXPORT_API void SetLambda(VRIKSolver *solver, float lambda)
+    {
+        solver->gpconstraint.lambda = lambda;
+    }
+
     EXPORT_API void AddRightPositionGoal(VRIKSolver *solver, float goal_x, float goal_y, float goal_z)
     {
-
         Vector3d ggoal(goal_x, goal_y, goal_z);
-
         solver->gpconstraint.SetRightGlobalGoal(ggoal);
     }
 
     EXPORT_API void AddLeftPositionGoal(VRIKSolver *solver, float goal_x, float goal_y, float goal_z)
     {
-
         Vector3d ggoal(goal_x, goal_y, goal_z);
         solver->gpconstraint.SetLeftGlobalGoal(ggoal);
     }
 
-    EXPORT_API void AddVelocityGoal(VRIKSolver *solver, float goal_x, float goal_y, float goal_z)
+    EXPORT_API void AddRightVelocityGoal(VRIKSolver *solver, float goal_x, float goal_y, float goal_z)
     {
         Vector3d vgoal(goal_x, goal_y, goal_z);
+        solver->gpconstraint.SetRightVelocityGoal(vgoal);
+    }
 
-        solver->gpconstraint.SetVelocityGoal(vgoal);
+    EXPORT_API void AddLeftVelocityGoal(VRIKSolver *solver, float goal_x, float goal_y, float goal_z)
+    {
+        Vector3d vgoal(goal_x, goal_y, goal_z);
+        solver->gpconstraint.SetLeftVelocityGoal(vgoal);
     }
 
     EXPORT_API void Solve(VRIKSolver *solver)
