@@ -49,10 +49,11 @@ def quaternion_to_angular_velocity(motions):
 
     return np.asarray(result)
 
+
 def calculate_effector_velocity(joint, br):
     positions = []
 
-    for frame,_ in enumerate(br.motions):
+    for frame, _ in enumerate(br.motions):
         br.skeleton.apply_frame(br.motions[frame][3:])
         br.skeleton.root.update_global_transform()
         pos = br.skeleton.joints[joint].global_transform.to_translation()
@@ -64,7 +65,7 @@ def calculate_effector_velocity(joint, br):
     return velocities
 
 
-def save_model(model):
+def save_model(model, mean, std):
     import json
     output_filename = 'testmodel'
 
@@ -73,6 +74,8 @@ def save_model(model):
     output_dict["Y"] = model.Y.values.tolist()
     output_dict["kernel"] = model.kern.to_dict()
     output_dict["likelihood"] = model.likelihood.to_dict()
+    output_dict["mean"] = mean.tolist()
+    output_dict["std"] = std.tolist()
 
     with open(output_filename + ".json", "w") as outfile:
         json.dump(output_dict, outfile)
@@ -85,14 +88,20 @@ if __name__ == "__main__":
     # データの下処理
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
-    Y = np.hstack((Y, calculate_effector_velocity(16, br)))
+    # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
     Y = Y[::5]
 
     kernel = GPy.kern.RBF(input_dim=2, lengthscale=None, ARD=False)
 
+    Y_mean = Y.mean(0)
+
+    # 分散が０のものは１でよい？
+    Y_std = Y.std(0)
+    Y_std[Y_std == 0] = 1.
+    Y_normalized = np.divide(Y-Y_mean, Y_std, where=Y.std(0) > 0)
+
     # model = ScaledGPLVM(Y, 2, kernel=kernel)
-    model = GPy.models.GPLVM(Y, 2, kernel=kernel)
-    # model = GPy.models.BCGPLVM(Y, 2, kernel=kernel)
+    model = GPy.models.GPLVM(Y_normalized, 2, kernel=kernel)
 
     model.optimize(messages=1, max_iters=5e20)
 
@@ -106,4 +115,4 @@ if __name__ == "__main__":
 
     GPy.plotting.show(canvas, filename='wishart_metric_notebook')
 
-    save_model(model)
+    save_model(model, Y_mean, Y_std)

@@ -44,7 +44,6 @@
                 "/IC:/Program Files (x86)/Windows Kits/10/include/10.0.17134.0/winrt",
                 "/IC:/Program Files (x86)/Windows Kits/10/include/10.0.17134.0/cppwinrt",
                 "VRIK_SolverTest.cpp",
-                "VRIK_Solver.cpp",
                 "json11/json11.cpp",
                 "iksolver/intern/IK_QJacobian.cpp",
                 "iksolver/intern/IK_QSegment.cpp",
@@ -78,7 +77,6 @@
                 "/IC:/Program Files (x86)/Windows Kits/10/include/10.0.17134.0/winrt",
                 "/IC:/Program Files (x86)/Windows Kits/10/include/10.0.17134.0/cppwinrt",
                 "VRIK_SolverDll.cpp",
-                "VRIK_Solver.cpp",
                 "json11/json11.cpp",
                 "iksolver/intern/IK_QJacobian.cpp",
                 "iksolver/intern/IK_QSegment.cpp",
@@ -103,11 +101,38 @@
                 "/DLL",
                 "/OUT:VRIKSolver.dll",
                 "VRIK_SolverDll.obj",
-                "VRIK_Solver.obj",
                 "json11.obj",
                 "IK_QJacobian.obj",
                 "IK_QSegment.obj",
                 "IK_QTask.obj"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "hoge",
+            "type": "shell",
+            "command": "C:/'Program Files (x86)'/'Microsoft Visual Studio'/2017/BuildTools/VC/Tools/MSVC/14.15.26726/bin/Hostx64/x64/cl.exe",
+            "options": {
+                "env": {
+                    "LIB": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Tools\\MSVC\\14.15.26726\\lib\\x64;C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.6.1\\lib\\um\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.17134.0\\ucrt\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.17134.0\\um\\x64;"
+                }
+            },
+            "args": [
+                "/EHsc",
+                "/Zi",
+                "/DEBUG",
+                "/IC:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/VC/Tools/MSVC/14.15.26726/include",
+                "/IC:/Program Files (x86)/Windows Kits/NETFXSDK/4.6.1/include/um",
+                "/IC:/Program Files (x86)/Windows Kits/10/include/10.0.17134.0/ucrt",
+                "/IC:/Program Files (x86)/Windows Kits/10/include/10.0.17134.0/shared",
+                "/IC:/Program Files (x86)/Windows Kits/10/include/10.0.17134.0/um",
+                "/IC:/Program Files (x86)/Windows Kits/10/include/10.0.17134.0/winrt",
+                "/IC:/Program Files (x86)/Windows Kits/10/include/10.0.17134.0/cppwinrt",
+                "${file}"
             ],
             "group": {
                 "kind": "build",
