@@ -77,8 +77,16 @@ def save_model(model, mean, std):
     output_dict["mean"] = mean.tolist()
     output_dict["std"] = std.tolist()
 
+    # output_dict["class"] = "GPy.core.GP"
+    # output_dict["name"] = "stylevrikmodel"
+    # output_dict["inference_method"] = model.inference_method.to_dict()
+
     with open(output_filename + ".json", "w") as outfile:
         json.dump(output_dict, outfile)
+
+
+def add_gaussian_noise(arr):
+    return arr + np.random.normal(0.0, 0.05, arr.shape)
 
 
 if __name__ == "__main__":
@@ -103,6 +111,11 @@ if __name__ == "__main__":
 
     # model = ScaledGPLVM(Y, 2, kernel=kernel)
     model = GPy.models.GPLVM(Y_normalized, 2, kernel=kernel)
+
+    model.optimize(messages=1, max_iters=5e20)
+
+    model.Y_normalized = add_gaussian_noise(Y_normalized)
+    model.unlink_parameter(model.X)
 
     model.optimize(messages=1, max_iters=5e20)
 
