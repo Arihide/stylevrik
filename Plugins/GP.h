@@ -202,10 +202,10 @@ class GP
         // VectorXd _f = f(x);
 
         // yの勾配
-        VectorXd y_grad = (_y - _f) / sigma;
+        VectorXd y_grad = (_y - _f).cwiseProduct(st).cwiseProduct(st) / sigma;
 
         // p(y|x)と相似な値
-        double pyx = y_grad.squaredNorm() * sigma;
+        double pyx = (_y - _f).cwiseProduct(st).squaredNorm() / sigma;
 
         // Shape: (D, dim_x)
         MatrixXd dk_stardx;
