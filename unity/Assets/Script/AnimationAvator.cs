@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 using Neuron;
 
@@ -16,8 +18,11 @@ public class AnimationAvator : MonoBehaviour
     public Transform RightHandTarget;
     public Transform HeadTarget;
 
-    public string SkeletonPath = "C:/Users/Takahashi/Desktop/VRAvater/Plugins/skeleton.json";
-    public string GPModelPath = "C:/Users/Takahashi/Desktop/VRAvater/Plugins/expmap_model_reduce.json";
+    private string SkeletonPath;
+    private string GPModelPath;
+
+    public string SkeletonName = "skeleton.json";
+    public string GPModelName = "expmap_model_reduce.json";
 
     public Transform Point;
 
@@ -28,6 +33,14 @@ public class AnimationAvator : MonoBehaviour
 
         actor = GetComponent<Actor>();
         animator = GetComponent<Animator>();
+
+        SkeletonPath = Path.Combine(Application.dataPath, Path.Combine("Plugins", SkeletonName));
+        GPModelPath = Path.Combine(Application.dataPath, Path.Combine("Plugins", GPModelName));
+
+        if (File.Exists(SkeletonPath) == false || File.Exists(GPModelPath) == false)
+        {
+            throw new FileNotFoundException();
+        }
 
         solver = VRIKSolver.Create(SkeletonPath, GPModelPath);
 

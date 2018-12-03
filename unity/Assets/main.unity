@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -569,8 +569,8 @@ MonoBehaviour:
   LeftHandTarget: {fileID: 1527730331}
   RightHandTarget: {fileID: 520366626}
   HeadTarget: {fileID: 2128534305}
-  SkeletonPath: C:/Users/Takahashi/Desktop/VRAvater/Plugins/skeleton.json
-  GPModelPath: C:/Users/Takahashi/Desktop/VRAvater/Plugins/testmodel.json
+  SkeletonPath: C:/Users/demo/Desktop/stylevrik/Plugins/skeleton.json
+  GPModelPath: C:/Users/demo/Desktop/stylevrik/Plugins/expmap_model_reduce.json
   Point: {fileID: 356233638}
   max_iterations: 5
 --- !u!114 &1716061827
