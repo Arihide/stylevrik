@@ -569,8 +569,8 @@ MonoBehaviour:
   LeftHandTarget: {fileID: 1527730331}
   RightHandTarget: {fileID: 520366626}
   HeadTarget: {fileID: 2128534305}
-  SkeletonPath: C:/Users/demo/Desktop/stylevrik/Plugins/skeleton.json
-  GPModelPath: C:/Users/demo/Desktop/stylevrik/Plugins/expmap_model_reduce.json
+  SkeletonName: skeleton.json
+  GPModelName: testmodel.json
   Point: {fileID: 356233638}
   max_iterations: 5
 --- !u!114 &1716061827
