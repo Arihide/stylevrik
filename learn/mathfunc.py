@@ -42,9 +42,6 @@ def expmap_to_euler(expmapArray):
 
     return result
 
-# def add_gaussian_noise():
-#     pass
-
 # この関数は正しいはず。ブレンダーで確認済み
 
 
