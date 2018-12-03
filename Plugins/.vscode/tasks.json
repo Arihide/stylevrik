@@ -6,7 +6,14 @@
         {
             "label": "buildLib",
             "type": "shell",
-            "command": "g++ -c ./json11/json11.cpp ./iksolver/intern/IK_*.cpp",
+            "command": "g++",
+            "args": [
+                "-c",
+                "./json11/json11.cpp",
+                "./iksolver/intern/IK_QJacobian.cpp",
+                "./iksolver/intern/IK_QSegment.cpp",
+                "./iksolver/intern/IK_QTask.cpp"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -16,7 +23,13 @@
         {
             "label": "vriktest",
             "type": "shell",
-            "command": "g++ -g ./VRIK_SolverTest.cpp ./VRIK_Solver.cpp ./json11.o ./IK_*.o",
+            "command": "g++",
+            "args": [
+                "-g",
+                "./VRIK_SolverTest.cpp",
+                "./json11.o",
+                "./IK_*.o"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
