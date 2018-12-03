@@ -89,6 +89,17 @@ def add_gaussian_noise(arr):
     return arr + np.random.normal(0.0, 0.05, arr.shape)
 
 
+def select_active_set(model, initial_idx=0):
+    mu, var = model.predict(model.X)
+    indices = var.flatten().argsort()[:30]
+    X = model.X[indices]
+    Y = model.Y_normalized[indices]
+
+    return GPy.core.GP(
+        X, Y, model.kern, model.likelihood, inference_method=model.inference_method
+    )
+
+
 if __name__ == "__main__":
     br = BVHReader('bvh/walk00.bvh')
     br.read()
@@ -97,7 +108,7 @@ if __name__ == "__main__":
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
     # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
-    Y = Y[::5]
+    # Y = Y[::5]
 
     kernel = GPy.kern.RBF(input_dim=2, lengthscale=None, ARD=False)
 
@@ -114,19 +125,20 @@ if __name__ == "__main__":
 
     model.optimize(messages=1, max_iters=5e20)
 
-    model.Y_normalized = add_gaussian_noise(Y_normalized)
-    model.unlink_parameter(model.X)
+    # model.Y_normalized = add_gaussian_noise(Y_normalized)
+    # model.unlink_parameter(model.X)
+    # model.optimize(messages=1, max_iters=5e20)
 
-    model.optimize(messages=1, max_iters=5e20)
+    model = select_active_set(model)
 
-    figure = GPy.plotting.plotting_library().figure(1, 2,
-                                                    shared_yaxes=True,
-                                                    shared_xaxes=True
-                                                    )
+    # figure = GPy.plotting.plotting_library().figure(1, 2,
+    #                                                 shared_yaxes=True,
+    #                                                 shared_xaxes=True
+    #                                                 )
 
-    canvas = model.plot_latent(labels=np.zeros(
-        Y.shape[0]), figure=figure, legend=False)
+    # canvas = model.plot_latent(labels=np.zeros(
+    #     model.Y_normalized.shape[0]), figure=figure, legend=False)
 
-    GPy.plotting.show(canvas, filename='wishart_metric_notebook')
+    # GPy.plotting.show(canvas, filename='wishart_metric_notebook')
 
     save_model(model, Y_mean, Y_std)
