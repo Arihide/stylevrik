@@ -31,9 +31,6 @@ public class AnimationAvator : MonoBehaviour
     void Awake()
     {
 
-        actor = GetComponent<Actor>();
-        animator = GetComponent<Animator>();
-
         SkeletonPath = Path.Combine(Application.dataPath, Path.Combine("Plugins", SkeletonName));
         GPModelPath = Path.Combine(Application.dataPath, Path.Combine("Plugins", GPModelName));
 
@@ -41,6 +38,9 @@ public class AnimationAvator : MonoBehaviour
         {
             throw new FileNotFoundException();
         }
+
+        actor = GetComponent<Actor>();
+        animator = GetComponent<Animator>();
 
         solver = VRIKSolver.Create(SkeletonPath, GPModelPath);
 
