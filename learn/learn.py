@@ -82,7 +82,7 @@ def save_model(model, mean, std):
 
 
 if __name__ == "__main__":
-    br = BVHReader('bvh/walk01.bvh')
+    br = BVHReader('bvh/walk00.bvh')
     br.read()
 
     # データの下処理
