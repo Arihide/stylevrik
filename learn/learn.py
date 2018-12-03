@@ -98,8 +98,7 @@ if __name__ == "__main__":
     # 分散が０のものは１でよい？
     Y_std = Y.std(0)
     Y_std[Y_std == 0] = 1.
-    # Y_normalized = np.divide(Y-Y_mean, Y_std, where=Y.std(0) > 0)
-    Y_normalized = Y-Y_mean
+    Y_normalized = np.divide(Y - Y_mean, Y_std, where=Y.std(0) > 0)
 
     # model = ScaledGPLVM(Y, 2, kernel=kernel)
     model = GPy.models.GPLVM(Y_normalized, 2, kernel=kernel)
