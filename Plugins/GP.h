@@ -16,19 +16,19 @@ class GP
   public:
     int dim, x_dim, y_dim;
     // 教師データ(Active set)の数
-    int D;
+    int N;
 
+    // 以下3つのパラメータはモデルの滑らかさに影響する。最適化計算中に変更することを検討する
     double kernel_variance;
     // kernel一つ一つにlengthscaleを割り当てることも検討する
     double kernel_lengthscale;
-
     double gaussian_variance;
 
     // カーネル行列とその逆行列
     MatrixXd K, K_inv;
     // カーネル行列は正定値対称行列なので、コレスキー分解ができる。その結果の下三角行列
     MatrixXd L;
-    // 教師データ行列(D, y_dim)
+    // 教師データ行列(N, y_dim)
     MatrixXd Y;
     // alpha=L*Y 事後確率を求めるときに簡単になる
     MatrixXd alpha;
@@ -61,17 +61,17 @@ class GP
         auto &arrMean = json["mean"].array_items();
         auto &arrStd = json["std"].array_items();
 
-        D = arrX.size();
+        N = arrX.size();
         x_dim = arrX[0].array_items().size();
         y_dim = arrY[0].array_items().size();
         dim = x_dim + y_dim;
 
-        Y.resize(D, y_dim);
+        Y.resize(N, y_dim);
 
         mean.resize(y_dim);
         st.resize(y_dim);
 
-        for (int i = 0; i < D; i++)
+        for (int i = 0; i < N; i++)
         {
             VectorXd *x = new VectorXd(x_dim);
 
@@ -98,37 +98,38 @@ class GP
 
         // 共分散行列（カーネル行列）の計算
         // 対称行列なので下半分だけ求めればよいはずー＞これからやる
-        K.resize(D, D);
-        for (int i = 0; i < D; i++)
+        K.resize(N, N);
+        for (int i = 0; i < N; i++)
         {
-            for (int j = 0; j < D; j++)
+            for (int j = 0; j < N; j++)
             {
                 K(i, j) = rbf((*inputs[i]), (*inputs[j]));
             }
         }
 
         MatrixXd Ky = K;
-        Ky.diagonal() += (gaussian_variance + 1e-8) * VectorXd::Ones(D);
+        Ky.diagonal() += (gaussian_variance + 1e-8) * VectorXd::Ones(N);
 
-        L.resize(D, D);
-        L.topLeftCorner(D, D) = Ky.topLeftCorner(D, D).selfadjointView<Eigen::Lower>().llt().matrixL();
+        L.resize(N, N);
+        L.topLeftCorner(N, N) = Ky.topLeftCorner(N, N).selfadjointView<Eigen::Lower>().llt().matrixL();
 
-        alpha.resize(D, y_dim);
-        alpha = L.topLeftCorner(D, D).triangularView<Lower>().solve(Y);
-        L.topLeftCorner(D, D).triangularView<Eigen::Lower>().adjoint().solveInPlace(alpha);
+        alpha.resize(N, y_dim);
+        alpha = L.topLeftCorner(N, N).triangularView<Lower>().solve(Y);
+        L.topLeftCorner(N, N).triangularView<Eigen::Lower>().adjoint().solveInPlace(alpha);
         // alpha = Ky.llt().solve(Y);
 
         // 逆行列
         K_inv = L * L.transpose();
         K_inv = K_inv.inverse();
 
+        k_star.resize(N);
+        
         // cout << K_inv << endl;
     }
 
     void update_k_star(const VectorXd &x_star)
     {
-        k_star.resize(D);
-        for (int i = 0; i < D; i++)
+        for (int i = 0; i < N; i++)
         {
             k_star(i) = rbf(x_star, (*inputs[i]));
         }
@@ -145,7 +146,7 @@ class GP
     // 事後分布の分散
     double var(const VectorXd &x)
     {
-        VectorXd v = L.topLeftCorner(D, D).triangularView<Eigen::Lower>().solve(k_star);
+        VectorXd v = L.topLeftCorner(N, N).triangularView<Eigen::Lower>().solve(k_star);
 
         return rbf(x, x) - v.dot(v) + gaussian_variance;
     }
@@ -155,10 +156,10 @@ class GP
 
         update_k_star(x.tail(x_dim));
 
-        // Shape: (D, dim_x)
+        // Shape: (N, dim_x)
         MatrixXd dk_stardx;
-        dk_stardx.resize(D, x_dim);
-        for (int ix = 0; ix < D; ix++)
+        dk_stardx.resize(N, x_dim);
+        for (int ix = 0; ix < N; ix++)
         {
             dk_stardx.row(ix) = ((*inputs[ix]) - x.tail(x_dim)) * k_star(ix) / (kernel_lengthscale * kernel_lengthscale);
         }
@@ -171,10 +172,10 @@ class GP
 
         update_k_star(x.tail(x_dim));
 
-        // Shape: (D, dim_x)
+        // Shape: (N, dim_x)
         MatrixXd dk_stardx;
-        dk_stardx.resize(D, x_dim);
-        for (int ix = 0; ix < D; ix++)
+        dk_stardx.resize(N, x_dim);
+        for (int ix = 0; ix < N; ix++)
         {
             dk_stardx.row(ix) = ((*inputs[ix]) - x.tail(x_dim)) * k_star(ix) / (kernel_lengthscale * kernel_lengthscale);
         }
@@ -190,7 +191,7 @@ class GP
 
         update_k_star(_x);
 
-        VectorXd v = L.topLeftCorner(D, D).triangularView<Eigen::Lower>().solve(k_star);
+        VectorXd v = L.topLeftCorner(N, N).triangularView<Eigen::Lower>().solve(k_star);
         double sigma = rbf(x, x) - v.dot(v) + gaussian_variance;
         // double sigma = var(x);
         // VectorXd sigma = (rbf(x, x) - v.dot(v) + gaussian_variance) * std;
@@ -207,10 +208,10 @@ class GP
         // p(y|x)と相似な値
         double pyx = (_y - _f).cwiseProduct(st).squaredNorm() / sigma;
 
-        // Shape: (D, dim_x)
+        // Shape: (N, dim_x)
         MatrixXd dk_stardx;
-        dk_stardx.resize(D, x_dim);
-        for (int ix = 0; ix < D; ix++)
+        dk_stardx.resize(N, x_dim);
+        for (int ix = 0; ix < N; ix++)
         {
             dk_stardx.row(ix) = ((*inputs[ix]) - x.tail(x_dim)) * k_star(ix) / (kernel_lengthscale * kernel_lengthscale);
         }
@@ -224,11 +225,11 @@ class GP
         VectorXd _dsigmadx = -2. * k_star.transpose() * K_inv * dk_stardx;
 
         // xの勾配
-        x_grad.tail(x_dim) = -_dfdx.transpose() * y_grad + _dsigmadx * (D - pyx) / (2 * sigma) + _x;
+        x_grad.tail(x_dim) = -_dfdx.transpose() * y_grad + _dsigmadx * (y_dim - pyx) / (2 * sigma) + _x;
         x_grad.head(y_dim) = y_grad;
         // x_grad.head(y_dim) = (y_grad + mean).cwiseProduct(st);
 
         // 尤度
-        return (pyx + (D * log(sigma)) + _x.squaredNorm()) / 2;
+        return (pyx + (y_dim * log(sigma)) + _x.squaredNorm()) / 2;
     }
 };
