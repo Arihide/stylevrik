@@ -108,8 +108,8 @@ if __name__ == "__main__":
     # データの下処理
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
-    # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
-    # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
+    Y = np.hstack((Y, calculate_effector_velocity(16, br)))
+    Y = np.hstack((Y, calculate_effector_velocity(39, br)))
     # Y = Y[::5]
 
     kernel = GPy.kern.RBF(input_dim=2, lengthscale=None, ARD=False)
@@ -128,9 +128,9 @@ if __name__ == "__main__":
     model.optimize(messages=1, max_iters=5e20)
 
     # smooth model
-    # model.Y_normalized = add_gaussian_noise(Y_normalized)
-    # model.unlink_parameter(model.X)
-    # model.optimize(messages=1, max_iters=5e20)
+    model.Y_normalized = add_gaussian_noise(Y_normalized)
+    model.unlink_parameter(model.X)
+    model.optimize(messages=1, max_iters=5e20)
 
     figure = GPy.plotting.plotting_library().figure(1, 2,
                                                     shared_yaxes=True,
