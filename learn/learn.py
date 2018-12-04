@@ -124,7 +124,6 @@ if __name__ == "__main__":
 
     # model = ScaledGPLVM(Y, 2, kernel=kernel)
     model = GPy.models.GPLVM(Y_normalized, 2, kernel=kernel)
-
     model.optimize(messages=1, max_iters=5e20)
 
     # smooth model
