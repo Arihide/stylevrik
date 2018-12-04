@@ -119,7 +119,7 @@ if __name__ == "__main__":
     # 分散が０のものは１でよい？
     Y_std = Y.std(0)
     Y_std[Y_std == 0] = 1.
-    Y_normalized = np.divide(Y-Y_mean, Y_std, where=Y.std(0) > 0)
+    Y_normalized = np.divide(Y-Y_mean, Y_std, where=Y.std(0) != 1)
     # Y_normalized = Y-Y_mean
 
     # model = ScaledGPLVM(Y, 2, kernel=kernel)
@@ -127,9 +127,9 @@ if __name__ == "__main__":
     model.optimize(messages=1, max_iters=5e20)
 
     # smooth model
-    model.Y_normalized = add_gaussian_noise(Y_normalized)
-    model.unlink_parameter(model.X)
-    model.optimize(messages=1, max_iters=5e20)
+    # model.Y_normalized = add_gaussian_noise(Y_normalized)
+    # model.unlink_parameter(model.X)
+    # model.optimize(messages=1, max_iters=5e20)
 
     figure = GPy.plotting.plotting_library().figure(1, 2,
                                                     shared_yaxes=True,
