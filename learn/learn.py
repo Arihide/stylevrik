@@ -107,7 +107,7 @@ if __name__ == "__main__":
     # データの下処理
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
-    # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
+    Y = np.hstack((Y, calculate_effector_velocity(16, br)))
     # Y = Y[::5]
 
     kernel = GPy.kern.RBF(input_dim=2, lengthscale=None, ARD=False)
@@ -117,28 +117,29 @@ if __name__ == "__main__":
     # 分散が０のものは１でよい？
     Y_std = Y.std(0)
     Y_std[Y_std == 0] = 1.
-    # Y_normalized = np.divide(Y-Y_mean, Y_std, where=Y.std(0) > 0)
-    Y_normalized = Y-Y_mean
+    Y_normalized = np.divide(Y-Y_mean, Y_std, where=Y.std(0) > 0)
+    # Y_normalized = Y-Y_mean
 
     # model = ScaledGPLVM(Y, 2, kernel=kernel)
     model = GPy.models.GPLVM(Y_normalized, 2, kernel=kernel)
 
     model.optimize(messages=1, max_iters=5e20)
 
+    # smooth model
     # model.Y_normalized = add_gaussian_noise(Y_normalized)
     # model.unlink_parameter(model.X)
     # model.optimize(messages=1, max_iters=5e20)
 
+    figure = GPy.plotting.plotting_library().figure(1, 2,
+                                                    shared_yaxes=True,
+                                                    shared_xaxes=True
+                                                    )
+
+    canvas = model.plot_latent(labels=np.zeros(
+        model.Y_normalized.shape[0]), figure=figure, legend=False)
+
+    GPy.plotting.show(canvas, filename='wishart_metric_notebook')
+
     model = select_active_set(model)
-
-    # figure = GPy.plotting.plotting_library().figure(1, 2,
-    #                                                 shared_yaxes=True,
-    #                                                 shared_xaxes=True
-    #                                                 )
-
-    # canvas = model.plot_latent(labels=np.zeros(
-    #     model.Y_normalized.shape[0]), figure=figure, legend=False)
-
-    # GPy.plotting.show(canvas, filename='wishart_metric_notebook')
 
     save_model(model, Y_mean, Y_std)

@@ -35,7 +35,7 @@ class GP
     // 新しい潜在変数xと、教師データから得られるカーネル関数のベクトル
     VectorXd k_star;
 
-    // 正規化する前の元のデータの平均、分散
+    // 正規化する前の元のデータの平均、標準偏差
     VectorXd mean, st;
 
     std::vector<VectorXd *> inputs;
@@ -82,8 +82,6 @@ class GP
                 Y(i, iy) = arrY[i][iy].number_value();
 
             inputs.push_back(x);
-
-            st(i) = arrStd[i].number_value();
         }
 
         for (int i = 0; i < y_dim; i++)
@@ -123,7 +121,7 @@ class GP
         K_inv = K_inv.inverse();
 
         k_star.resize(N);
-        
+
         // cout << K_inv << endl;
     }
 
@@ -198,8 +196,8 @@ class GP
 
         // assert(sigma > 0)
 
+        // 事後分布の平均
         VectorXd _f = (alpha.transpose() * k_star) + mean;
-        // VectorXd _f = (alpha.transpose() * k_star).cwiseProduct(st) + mean;
         // VectorXd _f = f(x);
 
         // yの勾配
