@@ -101,8 +101,8 @@ def select_active_set(model, initial_idx=0):
 
 
 if __name__ == "__main__":
-    br = BVHReader('bvh/walk00.bvh')
-    # br = BVHReader('bvh/handcrafted_cyclewalk.bvh')
+    # br = BVHReader('bvh/walk00.bvh')
+    br = BVHReader('bvh/handcrafted_cyclewalk.bvh')
     br.read()
 
     # データの下処理
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
     # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
     # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
-    Y = Y[::5]
+    # Y = Y[::5]
 
     kernel = GPy.kern.RBF(input_dim=2, lengthscale=None, ARD=False)
 
@@ -119,6 +119,8 @@ if __name__ == "__main__":
     # 分散が０のものは１でよい？
     Y_std = Y.std(0)
     Y_std[Y_std == 0] = 1.
+
+    # これおかしい？
     # Y_normalized = np.divide(Y-Y_mean, Y_std, where=Y.std(0) != 1)
     Y_normalized = Y-Y_mean
 
