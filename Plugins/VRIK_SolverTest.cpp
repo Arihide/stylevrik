@@ -106,8 +106,8 @@ int main()
 
     // 別のモデルでもテスト
     // gp.load("expmap_model_reduce.json");
-    // gp.load("testmodel.json");
-    gp.load("testmodel_with_vel.json")
+    gp.load("testmodel.json");
+    // gp.load("testmodel_with_vel.json");
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
     // 勾配の導関数が正しいか？
