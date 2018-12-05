@@ -102,8 +102,8 @@ def select_active_set(model, initial_idx=0):
 
 
 if __name__ == "__main__":
-    # br = BVHReader('bvh/walk00.bvh')
-    br = BVHReader('bvh/handcrafted_cyclewalk.bvh')
+    br = BVHReader('bvh/walk00.bvh')
+    # br = BVHReader('bvh/handcrafted_cyclewalk.bvh')
     br.read()
 
     # データの下処理
