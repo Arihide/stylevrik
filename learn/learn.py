@@ -65,13 +65,14 @@ def calculate_effector_velocity(joint, br):
     return velocities
 
 
-def save_model(model, mean, std):
+def save_model(model, Y, mean, std):
     import json
     output_filename = 'testmodel'
 
     output_dict = {}
     output_dict["X"] = model.X.values.tolist()
-    output_dict["Y"] = model.Y.values.tolist()
+    # output_dict["Y"] = model.Y.values.tolist()
+    output_dict["Y"] = Y.tolist()
     output_dict["kernel"] = model.kern.to_dict()
     output_dict["likelihood"] = model.likelihood.to_dict()
     output_dict["mean"] = mean.tolist()
@@ -101,16 +102,16 @@ def select_active_set(model, initial_idx=0):
 
 
 if __name__ == "__main__":
-    # br = BVHReader('bvh/walk00.bvh')
-    br = BVHReader('bvh/handcrafted_cyclewalk.bvh')
+    br = BVHReader('bvh/walk00.bvh')
+    # br = BVHReader('bvh/handcrafted_cyclewalk.bvh')
     br.read()
 
     # データの下処理
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
-    Y = np.hstack((Y, calculate_effector_velocity(16, br)))
-    Y = np.hstack((Y, calculate_effector_velocity(39, br)))
-    # Y = Y[::5]
+    # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
+    # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
+    Y = Y[::5]
 
     kernel = GPy.kern.RBF(input_dim=2, lengthscale=None, ARD=False)
 
@@ -129,9 +130,9 @@ if __name__ == "__main__":
     model.optimize(messages=1, max_iters=5e20)
 
     # smooth model
-    # model.Y_normalized = add_gaussian_noise(Y_normalized)
-    # model.unlink_parameter(model.X)
-    # model.optimize(messages=1, max_iters=5e20)
+    model.Y_normalized = add_gaussian_noise(Y_normalized)
+    model.unlink_parameter(model.X)
+    model.optimize(messages=1, max_iters=5e20)
 
     figure = GPy.plotting.plotting_library().figure(1, 2,
                                                     shared_yaxes=True,
@@ -145,4 +146,4 @@ if __name__ == "__main__":
 
     # model = select_active_set(model)
 
-    save_model(model, Y_mean, Y_std)
+    save_model(model, Y, Y_mean, 1./Y_std)
