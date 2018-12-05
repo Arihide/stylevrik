@@ -28,6 +28,8 @@ public class AnimationAvator : MonoBehaviour
 
     public int max_iterations = 20;
 
+    public float IKWeight = 0.5f;
+
     void Awake()
     {
 
@@ -44,7 +46,7 @@ public class AnimationAvator : MonoBehaviour
 
         solver = VRIKSolver.Create(SkeletonPath, GPModelPath);
 
-        VRIKSolver.SetLambda(solver, 1f);
+        VRIKSolver.SetLambda(solver, IKWeight);
 
         VRIKSolver.SetMaxIterations(solver, max_iterations);
 
