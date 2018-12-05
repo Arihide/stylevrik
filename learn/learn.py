@@ -109,8 +109,8 @@ if __name__ == "__main__":
     # データの下処理
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
-    # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
-    # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
+    Y = np.hstack((Y, calculate_effector_velocity(16, br)))
+    Y = np.hstack((Y, calculate_effector_velocity(39, br)))
     Y = Y[::5]
 
     kernel = GPy.kern.RBF(input_dim=2, lengthscale=None, ARD=False)
