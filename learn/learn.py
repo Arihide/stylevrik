@@ -130,9 +130,9 @@ if __name__ == "__main__":
     model.optimize(messages=1, max_iters=5e20)
 
     # smooth model
-    model.Y_normalized = add_gaussian_noise(Y_normalized)
-    model.unlink_parameter(model.X)
-    model.optimize(messages=1, max_iters=5e20)
+    # model.Y_normalized = add_gaussian_noise(Y_normalized)
+    # model.unlink_parameter(model.X)
+    # model.optimize(messages=1, max_iters=5e20)
 
     figure = GPy.plotting.plotting_library().figure(1, 2,
                                                     shared_yaxes=True,
