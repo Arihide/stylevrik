@@ -24,6 +24,10 @@ class GP
     double kernel_lengthscale;
     double gaussian_variance;
 
+    double smooth_kernel_variance;
+    double smooth_kernel_lengthscale;
+    double smooth_gaussian_variance;
+
     // カーネル行列とその逆行列
     MatrixXd K, K_inv;
     // カーネル行列は正定値対称行列なので、コレスキー分解ができる。その結果の下三角行列
@@ -35,8 +39,8 @@ class GP
     // 新しい潜在変数xと、教師データから得られるカーネル関数のベクトル
     VectorXd k_star;
 
-    // 正規化する前の元のデータの平均、標準偏差
-    VectorXd mean, st;
+    // 正規化する前の元のデータの平均、標準偏差、分散
+    VectorXd mean, st, va;
 
     std::vector<VectorXd *> inputs;
 
@@ -68,9 +72,6 @@ class GP
 
         Y.resize(N, y_dim);
 
-        mean.resize(y_dim);
-        st.resize(y_dim);
-
         for (int i = 0; i < N; i++)
         {
             VectorXd *x = new VectorXd(x_dim);
@@ -84,11 +85,15 @@ class GP
             inputs.push_back(x);
         }
 
+        mean.resize(y_dim);
+        st.resize(y_dim);
+        va.resize(y_dim);
         for (int i = 0; i < y_dim; i++)
         {
             mean(i) = arrMean[i].number_value();
             st(i) = arrStd[i].number_value();
         }
+        va = st.cwiseProduct(st);
 
         kernel_variance = json["kernel"]["variance"][0].number_value();
         kernel_lengthscale = json["kernel"]["lengthscale"][0].number_value();
@@ -203,7 +208,7 @@ class GP
         // VectorXd _f = f(x);
 
         // yの勾配
-        VectorXd y_grad = (_y - _f).cwiseProduct(st).cwiseProduct(st) / sigma;
+        VectorXd y_grad = (_y - _f).cwiseProduct(va) / sigma;
 
         // p(y|x)と相似な値
         double pyx = (_y - _f).cwiseProduct(st).squaredNorm() / sigma;
