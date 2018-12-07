@@ -17,9 +17,19 @@ using namespace std;
 
 class GPConstraint
 {
+    // skeleton.jsonからRightArmを求めたほうが良いはず
   private:
+    int RightShoulder = 13;
     int RightArm = 14;
+    int RightForeArm = 15;
+    int RightHand = 16;
+    int LeftShoulder = 17;
     int LeftArm = 18;
+    int LeftForeArm = 19;
+    int LeftHand = 20;
+
+    int rmatrows = 9;
+
   public:
     std::list<IK_QTask *> tasks;
     IK_QJacobian m_rjacobian;
@@ -60,20 +70,28 @@ class GPConstraint
 
         m_rootmatrix.setIdentity();
 
-        rroot = CreateSegment(14); // RightArm
-        rtip = CreateSegment(15);  // RightForeArm
-        SetSegmentTransform(rroot, 15);
-        SetSegmentTransform(rtip, 16);
-        segment_map[14] = rroot;
-        segment_map[15] = rtip;
+        IK_QSegment *seg;
+
+        rroot = CreateSegment(RightShoulder);
+        seg = CreateSegment(RightArm);      // RightArm
+        rtip = CreateSegment(RightForeArm); // RightForeArm
+        SetSegmentTransform(rroot, RightArm);
+        SetSegmentTransform(seg, RightForeArm);
+        SetSegmentTransform(rtip, RightHand);
+        segment_map[RightShoulder] = rroot;
+        segment_map[RightArm] = seg;
+        segment_map[RightForeArm] = rtip;
 
         // これやると勾配テストが通らない。。。長さが不ぞろいだとなにがまずい？->到達できない？
         // rroot->m_translation = Vector3d(25.876, 0, 0);
         // rtip->m_translation = Vector3d(28.40199, 0, 0);
 
-        rtip->SetParent(rroot);
+        rtip->SetParent(seg);
+        seg->SetParent(rroot);
+
         rroot->SetDoFId(0);
-        rtip->SetDoFId(3);
+        seg->SetDoFId(3);
+        rtip->SetDoFId(6);
         rroot->UpdateTransform(m_rootmatrix);
 
         Vector3d goal(1, 1, 1);
@@ -123,7 +141,7 @@ class GPConstraint
 
         lambda = 1;
 
-        m_rjacobian.ArmMatrices(6, 3);
+        m_rjacobian.ArmMatrices(rmatrows, 3);
         m_ljacobian.ArmMatrices(6, 3);
     }
 
@@ -151,7 +169,7 @@ class GPConstraint
         // mat.translation() << 20.5538, 160.075, -1.24851;
         // rptask->m_goal = mat.inverse() * ggoal;
 
-        auto &gt = skeleton[RightArm]["globalTranslation"].array_items();
+        auto &gt = skeleton[RightShoulder]["globalTranslation"].array_items();
 
         rptask->m_goal(0) = ggoal(0) - gt[0].number_value();
         rptask->m_goal(1) = ggoal(1) - gt[1].number_value();
@@ -239,7 +257,7 @@ class GPConstraint
         //     (*task)->ComputeJacobian(m_rjacobian);
         // }
 
-        rptask->ComputeExpMapJacobian(m_rjacobian, x.segment(RightArm * 3, 6));
+        rptask->ComputeExpMapJacobian(m_rjacobian, x.segment(RightShoulder * 3, rmatrows));
         lptask->ComputeExpMapJacobian(m_ljacobian, x.segment(LeftArm * 3, 6));
 
         x_grad = VectorXd::Zero(m_gp.dim);
@@ -247,7 +265,7 @@ class GPConstraint
         // 目的関数とその勾配
         obj = m_gp(x, x_grad);
 
-        x_grad.segment(RightArm * 3, 6) += -m_rjacobian.m_jacobian.transpose() * m_rjacobian.m_beta * lambda;
+        x_grad.segment(RightShoulder * 3, rmatrows) += -m_rjacobian.m_jacobian.transpose() * m_rjacobian.m_beta * lambda;
         x_grad.segment(LeftArm * 3, 6) += -m_ljacobian.m_jacobian.transpose() * m_ljacobian.m_beta * lambda;
 
         obj += m_rjacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;

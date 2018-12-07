@@ -106,8 +106,8 @@ int main()
 
     // 別のモデルでもテスト
     // gp.load("expmap_model_reduce.json");
-    // gp.load("testmodel.json");
-    gp.load("testmodel_3dim.json");
+    gp.load("testmodel_reduced.json");
+    // gp.load("testmodel_3dim.json");
     // gp.load("testmodel.1.json");
     // gp.load("testmodel_with_vel.json");
     x = VectorXd::Zero(gp.dim);
@@ -131,7 +131,7 @@ int main()
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
     // assert(check_gradient(gpcontraint, x, x_grad));
-    // solver.minimize(gpcontraint, x, fx);
+    solver.minimize(gpcontraint, x, fx);
 
     // gpcontraint(x, x_grad);
     // assert(check_gradient(gpconstraint, x, x_grad));
