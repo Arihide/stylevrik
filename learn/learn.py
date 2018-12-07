@@ -86,8 +86,8 @@ def save_model(model, Y, mean, std):
         json.dump(output_dict, outfile)
 
 
-def add_gaussian_noise(arr):
-    return arr + np.random.normal(0.0, 0.05, arr.shape)
+def add_gaussian_noise(arr, noise_variance=0.05):
+    return arr + np.random.normal(0.0, noise_variance, arr.shape)
 
 
 def select_active_set(model, initial_idx=0):
@@ -109,8 +109,9 @@ if __name__ == "__main__":
     # データの下処理
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
-    Y = np.hstack((Y, calculate_effector_velocity(16, br)))
-    Y = np.hstack((Y, calculate_effector_velocity(39, br)))
+    Y = motion_to_features(Y)
+    # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
+    # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
     # Y = Y[::5]
 
     kernel = GPy.kern.RBF(input_dim=2, lengthscale=None, ARD=False)
