@@ -46,26 +46,26 @@ def nodes(fp, node, indent):
 
 
 br = BVHReader('bvh/walk00.bvh')
+# br = BVHReader('bvh/handcrafted_cyclewalk.bvh')
 br.read()
 
-with open('bvh/motions.bvh', 'r') as fsource:
-    with open('test.bvh', 'w') as ftarget:
+with open('bvh/test.bvh', 'w') as ftarget:
 
-        ftarget.write('HIERARCHY\n')
+    ftarget.write('HIERARCHY\n')
 
-        nodes(ftarget, br._root, 0)
+    nodes(ftarget, br._root, 0)
 
-        ftarget.write('MOTION\n')
-        ftarget.write('Frames: %d\n' % len(br.motions))
-        ftarget.write('Frame Time: 0.041667\n')
+    ftarget.write('MOTION\n')
+    ftarget.write('Frames: %d\n' % len(br.motions))
+    ftarget.write('Frame Time: 0.041667\n')
 
-        delindices = list(range(17*3+3, 36*3+3))
-        delindices.extend(list(range(40*3+3, 60*3)))
+    delindices = list(range(17*3+3, 36*3+3))
+    delindices.extend(list(range(40*3+3, 59*3+3)))
 
-        for frame in br.motions:
+    for frame in br.motions:
 
-            arr = [x for i, x in enumerate(frame) if i not in delindices]
+        arr = [x for i, x in enumerate(frame) if i not in delindices]
 
-            ftarget.write(' '.join(map(str, arr)) + '\n')
+        ftarget.write(' '.join(map(str, arr)) + '\n')
 
-            print(len(arr))
+        print(len(arr))

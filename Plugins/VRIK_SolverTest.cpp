@@ -107,7 +107,8 @@ int main()
     // 別のモデルでもテスト
     // gp.load("expmap_model_reduce.json");
     // gp.load("testmodel.json");
-    gp.load("testmodel.1.json");
+    gp.load("testmodel_3dim.json");
+    // gp.load("testmodel.1.json");
     // gp.load("testmodel_with_vel.json");
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
@@ -125,7 +126,8 @@ int main()
 
     // IK
     GPConstraint gpcontraint;
-    gpcontraint.Initialize("skeleton.json", gp);
+    // gpcontraint.Initialize("skeleton.json", gp);
+    gpcontraint.Initialize("skeleton_reduced.json", gp);
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
     // assert(check_gradient(gpcontraint, x, x_grad));

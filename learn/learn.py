@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 from matplotlib import pyplot as plt
 import GPy
@@ -102,7 +103,10 @@ def select_active_set(model, initial_idx=0):
 
 
 if __name__ == "__main__":
-    br = BVHReader('bvh/walk00.bvh')
+    args = sys.argv
+
+    br = BVHReader(args[1])
+    # br = BVHReader('bvh/walk00.bvh')
     # br = BVHReader('bvh/handcrafted_cyclewalk.bvh')
     br.read()
 
@@ -126,8 +130,9 @@ if __name__ == "__main__":
     Y_normalized = np.divide(Y-Y_mean, Y_std)
     # Y_normalized = Y-Y_mean
 
+    latent_dim = 3
     # model = ScaledGPLVM(Y, 2, kernel=kernel)
-    model = GPy.models.GPLVM(Y_normalized, 2, kernel=kernel)
+    model = GPy.models.GPLVM(Y_normalized, latent_dim, kernel=kernel)
     model.optimize(messages=1, max_iters=5e20)
 
     # smooth model

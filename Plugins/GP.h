@@ -230,11 +230,11 @@ class GP
         VectorXd _dsigmadx = -2. * k_star.transpose() * K_inv * dk_stardx;
 
         // xの勾配
-        x_grad.tail(x_dim) = -_dfdx.transpose() * y_grad + _dsigmadx * (y_dim - pyx) / (2 * sigma) + _x;
+        x_grad.tail(x_dim) = -_dfdx.transpose() * y_grad + _dsigmadx * (y_dim - pyx) / (2. * sigma) + _x;
         x_grad.head(y_dim) = y_grad;
         // x_grad.head(y_dim) = (y_grad + mean).cwiseProduct(st);
 
         // 尤度
-        return (pyx + (y_dim * log(sigma)) + _x.squaredNorm()) / 2;
+        return (pyx + (y_dim * log(sigma)) + _x.squaredNorm()) / 2.;
     }
 };

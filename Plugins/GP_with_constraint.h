@@ -17,6 +17,9 @@ using namespace std;
 
 class GPConstraint
 {
+  private:
+    int RightArm = 14;
+    int LeftArm = 18;
   public:
     std::list<IK_QTask *> tasks;
     IK_QJacobian m_rjacobian;
@@ -59,10 +62,8 @@ class GPConstraint
 
         rroot = CreateSegment(14); // RightArm
         rtip = CreateSegment(15);  // RightForeArm
-
         SetSegmentTransform(rroot, 15);
         SetSegmentTransform(rtip, 16);
-
         segment_map[14] = rroot;
         segment_map[15] = rtip;
 
@@ -84,10 +85,21 @@ class GPConstraint
         rptask->SetId(0);
         rvtask->SetId(3);
 
-        lroot = CreateSegment(37); //LeftArm
-        ltip = CreateSegment(38);  //LeftForeArm
-        SetSegmentTransform(lroot, 38);
-        SetSegmentTransform(ltip, 39);
+        // 指先の関節を含めたとき
+        // lroot = CreateSegment(37); //LeftArm
+        // ltip = CreateSegment(38);  //LeftForeArm
+        // SetSegmentTransform(lroot, 38);
+        // SetSegmentTransform(ltip, 39);
+        // segment_map[37] = lroot;
+        // segment_map[38] = ltip;
+
+        lroot = CreateSegment(18); //LeftArm
+        ltip = CreateSegment(19);  //LeftForeArm
+        SetSegmentTransform(lroot, 19);
+        SetSegmentTransform(ltip, 20);
+        segment_map[18] = lroot;
+        segment_map[19] = ltip;
+
         ltip->SetParent(lroot);
         lroot->SetDoFId(0);
         ltip->SetDoFId(3);
@@ -96,9 +108,6 @@ class GPConstraint
 
         lptask->SetId(0);
         lvtask->SetId(3);
-
-        segment_map[37] = lroot;
-        segment_map[38] = ltip;
 
         lroot->UpdateTransform(m_rootmatrix);
 
@@ -142,17 +151,16 @@ class GPConstraint
         // mat.translation() << 20.5538, 160.075, -1.24851;
         // rptask->m_goal = mat.inverse() * ggoal;
 
-        auto &gt = skeleton[14]["globalTranslation"].array_items();
+        auto &gt = skeleton[RightArm]["globalTranslation"].array_items();
 
         rptask->m_goal(0) = ggoal(0) - gt[0].number_value();
         rptask->m_goal(1) = ggoal(1) - gt[1].number_value();
         rptask->m_goal(2) = ggoal(2) - gt[2].number_value();
-
     }
 
     void SetLeftGlobalGoal(Vector3d &ggoal)
     {
-        auto &gt = skeleton[37]["globalTranslation"].array_items();
+        auto &gt = skeleton[LeftArm]["globalTranslation"].array_items();
 
         lptask->m_goal(0) = ggoal(0) - gt[0].number_value();
         lptask->m_goal(1) = ggoal(1) - gt[1].number_value();
@@ -231,16 +239,16 @@ class GPConstraint
         //     (*task)->ComputeJacobian(m_rjacobian);
         // }
 
-        rptask->ComputeExpMapJacobian(m_rjacobian, x.segment(14 * 3, 6));
-        lptask->ComputeExpMapJacobian(m_ljacobian, x.segment(37 * 3, 6));
+        rptask->ComputeExpMapJacobian(m_rjacobian, x.segment(RightArm * 3, 6));
+        lptask->ComputeExpMapJacobian(m_ljacobian, x.segment(LeftArm * 3, 6));
 
         x_grad = VectorXd::Zero(m_gp.dim);
 
         // 目的関数とその勾配
         obj = m_gp(x, x_grad);
 
-        x_grad.segment(14 * 3, 6) += -m_rjacobian.m_jacobian.transpose() * m_rjacobian.m_beta * lambda;
-        x_grad.segment(37 * 3, 6) += -m_ljacobian.m_jacobian.transpose() * m_ljacobian.m_beta * lambda;
+        x_grad.segment(RightArm * 3, 6) += -m_rjacobian.m_jacobian.transpose() * m_rjacobian.m_beta * lambda;
+        x_grad.segment(LeftArm * 3, 6) += -m_ljacobian.m_jacobian.transpose() * m_ljacobian.m_beta * lambda;
 
         obj += m_rjacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
         obj += m_ljacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;

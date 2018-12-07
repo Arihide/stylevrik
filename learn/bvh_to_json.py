@@ -1,8 +1,15 @@
+import sys
 import json
 from skeleton import BVHReader
 
+
+
 if __name__ == "__main__":
-    br = BVHReader('bvh/walk00.bvh')
+
+    args = sys.argv
+
+    br = BVHReader(args[1])
+    # br = BVHReader('bvh/walk00.bvh')
     br.read()
 
     br.skeleton.apply_frame([0 for x in range(177)])
