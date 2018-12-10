@@ -47,7 +47,7 @@ class GP
     // RBFカーネルはこれで間違いないはず
     double rbf(const VectorXd &x1, const VectorXd &x2)
     {
-        return kernel_variance * exp(-0.5 * (x1 - x2).squaredNorm() / (kernel_lengthscale * kernel_lengthscale));
+        return kernel_variance * exp(-0.5 * (x1 - x2).squaredNorm() / (kernel_lengthscale));
     }
 
     // GPyで生成したパラメータの読み込み。
@@ -126,8 +126,6 @@ class GP
         K_inv = K_inv.inverse();
 
         k_star.resize(N);
-
-        // cout << K_inv << endl;
     }
 
     void update_k_star(const VectorXd &x_star)
@@ -164,7 +162,7 @@ class GP
         dk_stardx.resize(N, x_dim);
         for (int ix = 0; ix < N; ix++)
         {
-            dk_stardx.row(ix) = ((*inputs[ix]) - x.tail(x_dim)) * k_star(ix) / (kernel_lengthscale * kernel_lengthscale);
+            dk_stardx.row(ix) = ((*inputs[ix]) - x.tail(x_dim)) * k_star(ix) / (kernel_lengthscale);
         }
 
         return alpha.transpose() * dk_stardx;
@@ -180,7 +178,7 @@ class GP
         dk_stardx.resize(N, x_dim);
         for (int ix = 0; ix < N; ix++)
         {
-            dk_stardx.row(ix) = ((*inputs[ix]) - x.tail(x_dim)) * k_star(ix) / (kernel_lengthscale * kernel_lengthscale);
+            dk_stardx.row(ix) = ((*inputs[ix]) - x.tail(x_dim)) * k_star(ix) / (kernel_lengthscale);
         }
 
         return -2. * k_star.transpose() * K_inv * dk_stardx;
@@ -189,7 +187,6 @@ class GP
     double operator()(const VectorXd &x, VectorXd &x_grad)
     {
         VectorXd _x = x.tail(x_dim);
-        // VectorXd _y = x.head(y_dim);
         VectorXd _y = x.head(y_dim);
 
         update_k_star(_x);
@@ -218,7 +215,7 @@ class GP
         dk_stardx.resize(N, x_dim);
         for (int ix = 0; ix < N; ix++)
         {
-            dk_stardx.row(ix) = ((*inputs[ix]) - x.tail(x_dim)) * k_star(ix) / (kernel_lengthscale * kernel_lengthscale);
+            dk_stardx.row(ix) = ((*inputs[ix]) - x.tail(x_dim)) * k_star(ix) / (kernel_lengthscale);
         }
 
         // Shape: (dim_y, dim_x)
