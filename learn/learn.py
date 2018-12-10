@@ -127,7 +127,7 @@ if __name__ == "__main__":
     Y_std = Y.std(0)
     Y_std[Y_std == 0] = 1.
 
-    Y = Y[::3]
+    # Y = Y[::3]
 
     # これおかしい？
     Y_normalized = np.divide(Y-Y_mean, Y_std)
@@ -156,5 +156,13 @@ if __name__ == "__main__":
 
     GPy.plotting.show(canvas, filename='wishart_metric_notebook')
 
-    save_model(model, Y, Y_mean, 1./Y_std,
+    _, var = model.predict(model.X)
+    indices = var.flatten().argsort()[-50:]
+    X = model.X[indices]
+
+    model =  GPy.core.GP(
+        X, model.Y_normalized[indices], model.kern, model.likelihood, inference_method=model.inference_method
+    )
+
+    save_model(model, Y[indices], Y_mean, 1./Y_std,
                output_filename='%s_model' % args[1][:-4])
