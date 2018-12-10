@@ -66,9 +66,8 @@ def calculate_effector_velocity(joint, br):
     return velocities
 
 
-def save_model(model, Y, mean, std):
+def save_model(model, Y, mean, std, output_filename='testmodel'):
     import json
-    output_filename = 'testmodel'
 
     output_dict = {}
     output_dict["X"] = model.X.values.tolist()
@@ -106,14 +105,12 @@ if __name__ == "__main__":
     args = sys.argv
 
     br = BVHReader(args[1])
-    # br = BVHReader('bvh/walk00.bvh')
-    # br = BVHReader('bvh/handcrafted_cyclewalk.bvh')
     br.read()
 
     # データの下処理
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
-    # Y = motion_to_features(Y)
+    Y = motion_to_features(Y)
     # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
     # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
     # Y = Y[::5]
@@ -136,7 +133,7 @@ if __name__ == "__main__":
     model.optimize(messages=1, max_iters=5e20)
 
     # smooth model
-    model.Y_normalized = add_gaussian_noise(Y_normalized)
+    model.Y_normalized = add_gaussian_noise(Y_normalized, noise_variance=0.01)
     model.unlink_parameter(model.X)
     model.optimize(messages=1, max_iters=5e20)
 

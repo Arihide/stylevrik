@@ -1,3 +1,5 @@
+from os import path
+from sys import argv
 from bvh_reader import BVHReader
 
 
@@ -45,27 +47,36 @@ def nodes(fp, node, indent):
     fp.write('%s}\n' % indent_str)
 
 
-br = BVHReader('bvh/walk00.bvh')
-# br = BVHReader('bvh/handcrafted_cyclewalk.bvh')
-br.read()
+if __name__ == "__main__":
 
-with open('bvh/test.bvh', 'w') as ftarget:
+    filename = argv[1]
 
-    ftarget.write('HIERARCHY\n')
+    if path.exists(filename) is False:
+        raise FileNotFoundError()
 
-    nodes(ftarget, br._root, 0)
+    root, ext = path.splitext(filename)
 
-    ftarget.write('MOTION\n')
-    ftarget.write('Frames: %d\n' % len(br.motions))
-    ftarget.write('Frame Time: 0.041667\n')
+    if ext != ".bvh":
+        raise Exception()
 
-    delindices = list(range(17*3+3, 36*3+3))
-    delindices.extend(list(range(40*3+3, 59*3+3)))
+    br = BVHReader(filename)
+    br.read()
 
-    for frame in br.motions:
+    with open('%s_rmfinger%s' % (root, ext), 'w') as ftarget:
 
-        arr = [x for i, x in enumerate(frame) if i not in delindices]
+        ftarget.write('HIERARCHY\n')
 
-        ftarget.write(' '.join(map(str, arr)) + '\n')
+        nodes(ftarget, br._root, 0)
 
-        print(len(arr))
+        ftarget.write('MOTION\n')
+        ftarget.write('Frames: %d\n' % len(br.motions))
+        ftarget.write('Frame Time: 0.041667\n')
+
+        delindices = list(range(17*3+3, 36*3+3))
+        delindices.extend(list(range(40*3+3, 59*3+3)))
+
+        for frame in br.motions:
+
+            arr = [x for i, x in enumerate(frame) if i not in delindices]
+
+            ftarget.write(' '.join(map(str, arr)) + '\n')
