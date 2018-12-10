@@ -113,21 +113,21 @@ void IK_QPositionTask::ComputeExpMapJacobian(IK_QJacobian &jacobian, const Vecto
 
 	const IK_QSegment *seg;
 
-	// Matrix3d wmat = Matrix3d::Identity();
-	// Matrix3d wmat = m_segment->Parent()->Parent()->m_basis * m_segment->Parent()->m_basis;
-	Matrix3d wmat = m_segment->Parent()->GlobalTransform().linear();
+	Matrix3d wmat;
 	Vector3d p = Vector3d::Zero();
-	// Vector3d p = m_segment->m_translation;
 
 	for (seg = m_segment; seg; seg = seg->Parent())
 	{
+
+		if(seg->Parent())
+			wmat = seg->Parent()->GlobalTransform().linear();
+		else
+			wmat.setIdentity();
 
 		Vector3d ex = expmap.segment<3>(seg->DoFId());
 		double sqtheta = ex.squaredNorm();
 
 		p += seg->m_translation;
-		// Vector3d p = seg->GlobalStart() - pos;
-		// Vector3d p = seg->GlobalStart();
 
 		Matrix3d ex_hat;
 		ex_hat << 0, -ex(2), ex(1),
@@ -139,20 +139,12 @@ void IK_QPositionTask::ComputeExpMapJacobian(IK_QJacobian &jacobian, const Vecto
 			p(2), 0, -p(0),
 			-p(1), p(0), 0;
 
-		// jacobian.m_jacobian.block<3, 3>(0, seg->DoFId()) =
-		// 	wmat * -seg->GlobalTransform().linear() * p_hat *
-		// 	(ex * ex.transpose() + (seg->GlobalTransform().linear().transpose() - Matrix3d::Identity()) * ex_hat) / sqtheta;
-
 		jacobian.m_jacobian.block<3, 3>(0, seg->DoFId()) =
 			wmat * -seg->m_basis * p_hat *
 			(ex * ex.transpose() + (seg->m_basis.transpose() - Matrix3d::Identity()) * ex_hat) / sqtheta;
 
 		p = seg->m_basis * p;
 
-		if(seg->Parent() && seg->Parent()->Parent())
-			wmat = seg->Parent()->Parent()->m_basis;
-		else
-			wmat.setIdentity();
 	}
 }
 

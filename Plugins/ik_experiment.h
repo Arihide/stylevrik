@@ -48,7 +48,7 @@ class IK
 
         root->SetTransform(mstart, mrest, mbasis, mlength);
         mid->SetTransform(mstart, mrest, mbasis, mlength);
-        tip->SetTransform(mstart, mrest, mbasis, mlength);
+        tip->SetTransform(mstart, mrest, mbasis, mlength2);
 
         m_rootmatrix.setIdentity();
 

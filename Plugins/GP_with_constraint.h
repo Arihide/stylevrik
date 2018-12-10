@@ -29,6 +29,7 @@ class GPConstraint
     int LeftHand = 20;
 
     int rmatrows = 9;
+    int lmatrows = 9;
 
   public:
     std::list<IK_QTask *> tasks;
@@ -39,6 +40,9 @@ class GPConstraint
     IK_QSegment *lroot;
     IK_QSegment *ltip;
 
+    IK_QSegment *seg;
+    IK_QSegment *seg2;
+
     IK_QPositionTask *hptask;
     IK_QPositionTask *rptask;
     IK_QPositionTask *lptask;
@@ -46,7 +50,8 @@ class GPConstraint
     IK_QVelocityTask *lvtask;
     std::map<int, IK_QSegment *> segment_map;
     Affine3d m_rootmatrix;
-    double lambda;
+
+    double lambda = 1.0;
 
     GP m_gp;
 
@@ -70,8 +75,6 @@ class GPConstraint
 
         m_rootmatrix.setIdentity();
 
-        IK_QSegment *seg;
-
         rroot = CreateSegment(RightShoulder);
         seg = CreateSegment(RightArm);      // RightArm
         rtip = CreateSegment(RightForeArm); // RightForeArm
@@ -94,7 +97,7 @@ class GPConstraint
         rtip->SetDoFId(6);
         rroot->UpdateTransform(m_rootmatrix);
 
-        Vector3d goal(1, 1, 1);
+        Vector3d goal(1, 10, 1);
         Vector3d vgoal(0, 0, 0);
         // IK_QTask *ee = new IK_QPositionTask(true, rtip, goal);
         rptask = new IK_QPositionTask(true, rtip, goal);
@@ -111,16 +114,23 @@ class GPConstraint
         // segment_map[37] = lroot;
         // segment_map[38] = ltip;
 
-        lroot = CreateSegment(18); //LeftArm
-        ltip = CreateSegment(19);  //LeftForeArm
-        SetSegmentTransform(lroot, 19);
-        SetSegmentTransform(ltip, 20);
-        segment_map[18] = lroot;
-        segment_map[19] = ltip;
+        lroot = CreateSegment(LeftShoulder);
+        seg2 = CreateSegment(LeftArm);
+        ltip = CreateSegment(LeftForeArm);
+        SetSegmentTransform(lroot, LeftArm);
+        SetSegmentTransform(seg2, LeftForeArm);
+        SetSegmentTransform(ltip, LeftHand);
+        segment_map[LeftShoulder] = lroot;
+        segment_map[LeftArm] = seg2;
+        segment_map[LeftForeArm] = ltip;
 
-        ltip->SetParent(lroot);
+        ltip->SetParent(seg2);
+        seg2->SetParent(lroot);
+
         lroot->SetDoFId(0);
-        ltip->SetDoFId(3);
+        seg2->SetDoFId(3);
+        ltip->SetDoFId(6);
+
         lptask = new IK_QPositionTask(true, ltip, goal);
         lvtask = new IK_QVelocityTask(true, ltip, goal);
 
@@ -139,10 +149,8 @@ class GPConstraint
         //     primary_size += qtask->Size();
         // }
 
-        lambda = 1;
-
         m_rjacobian.ArmMatrices(rmatrows, 3);
-        m_ljacobian.ArmMatrices(6, 3);
+        m_ljacobian.ArmMatrices(lmatrows, 3);
     }
 
     IK_QSphericalSegment *CreateSegment(int id)
@@ -157,10 +165,14 @@ class GPConstraint
 
         auto &translation = skeleton[id]["translation"].array_items();
 
+        // seg->m_translation = Vector3d(
+        //     translation[0].number_value(),
+        //     translation[1].number_value(),
+        //     translation[2].number_value());
         seg->m_translation = Vector3d(
-            translation[0].number_value(),
-            translation[1].number_value(),
-            translation[2].number_value());
+            0,
+            10,
+            0);
     }
 
     void SetRightGlobalGoal(Vector3d &ggoal)
@@ -178,7 +190,7 @@ class GPConstraint
 
     void SetLeftGlobalGoal(Vector3d &ggoal)
     {
-        auto &gt = skeleton[LeftArm]["globalTranslation"].array_items();
+        auto &gt = skeleton[LeftShoulder]["globalTranslation"].array_items();
 
         lptask->m_goal(0) = ggoal(0) - gt[0].number_value();
         lptask->m_goal(1) = ggoal(1) - gt[1].number_value();
@@ -258,18 +270,20 @@ class GPConstraint
         // }
 
         rptask->ComputeExpMapJacobian(m_rjacobian, x.segment(RightShoulder * 3, rmatrows));
-        lptask->ComputeExpMapJacobian(m_ljacobian, x.segment(LeftArm * 3, 6));
+        lptask->ComputeExpMapJacobian(m_ljacobian, x.segment(LeftShoulder * 3, lmatrows));
 
         x_grad = VectorXd::Zero(m_gp.dim);
 
         // 目的関数とその勾配
-        obj = m_gp(x, x_grad);
+        // obj = m_gp(x, x_grad);
+        x_grad.setZero(x_grad.size());
+        obj = 0;
 
         x_grad.segment(RightShoulder * 3, rmatrows) += -m_rjacobian.m_jacobian.transpose() * m_rjacobian.m_beta * lambda;
-        x_grad.segment(LeftArm * 3, 6) += -m_ljacobian.m_jacobian.transpose() * m_ljacobian.m_beta * lambda;
+        // x_grad.segment(LeftShoulder * 3, lmatrows) += -m_ljacobian.m_jacobian.transpose() * m_ljacobian.m_beta * lambda;
 
         obj += m_rjacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
-        obj += m_ljacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
+        // obj += m_ljacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
 
         return obj;
     }
