@@ -16,6 +16,7 @@ import mathfunc
 
 
 def motion_to_features(motion, add_velocity=False, add_acceleration=False):
+
     # Shape of motion data is (frame, pose)
     if add_velocity == True:
         # velocity = np.gradient(motion, axis=0)
@@ -26,7 +27,11 @@ def motion_to_features(motion, add_velocity=False, add_acceleration=False):
             acceleration = np.gradient(velocity, axis=0)
             motion = np.hstack((motion, acceleration))
 
-    return motion
+    velocity = np.gradient(motion, axis=0)
+    acceleration = np.gradient(velocity, axis=0)
+    new_Y = np.hstack((motion, velocity, acceleration))
+
+    return new_Y
 
 
 def quaternion_to_angular_velocity(motions):
@@ -90,9 +95,10 @@ def add_gaussian_noise(arr, noise_variance=0.05):
     return arr + np.random.normal(0.0, noise_variance, arr.shape)
 
 
-def select_active_set(model, initial_idx=0):
+def select_active_set(model, M=50):
+
     mu, var = model.predict(model.X)
-    indices = var.flatten().argsort()[:30]
+    indices = var.flatten().argsort()[:M]
     X = model.X[indices]
     Y = model.Y_normalized[indices]
 
@@ -121,20 +127,24 @@ if __name__ == "__main__":
     Y_std = Y.std(0)
     Y_std[Y_std == 0] = 1.
 
-    Y = Y[::4]
-    
-    # これおかしい？  
+    Y = Y[::3]
+
+    # これおかしい？
     Y_normalized = np.divide(Y-Y_mean, Y_std)
 
     latent_dim = 3
     # model = ScaledGPLVM(Y, 2, kernel=kernel)
     model = GPy.models.GPLVM(Y_normalized, latent_dim, kernel=kernel)
+    # model = GPy.models.BCGPLVM(Y_normalized, latent_dim, kernel=kernel)
     model.optimize(messages=1, max_iters=5e20)
 
     # smooth model
     model.Y_normalized = add_gaussian_noise(Y_normalized, noise_variance=0.05)
     model.unlink_parameter(model.X)
     model.optimize(messages=1, max_iters=5e20)
+
+    # model = select_active_set(model)
+    model.optimize()
 
     figure = GPy.plotting.plotting_library().figure(1, 2,
                                                     shared_yaxes=True,
@@ -146,8 +156,5 @@ if __name__ == "__main__":
 
     GPy.plotting.show(canvas, filename='wishart_metric_notebook')
 
-    # model = select_active_set(model)
-
-
-
-    save_model(model, Y, Y_mean, 1./Y_std, output_filename='%s_model' % args[1][:-4])
+    save_model(model, Y, Y_mean, 1./Y_std,
+               output_filename='%s_model' % args[1][:-4])
