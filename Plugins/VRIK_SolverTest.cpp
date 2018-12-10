@@ -126,12 +126,11 @@ int main()
 
     // IK
     GPConstraint gpcontraint;
-    // gpcontraint.Initialize("skeleton.json", gp);
     gpcontraint.Initialize("skeleton_reduced.json", gp);
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
     assert(check_gradient(gpcontraint, x, x_grad));
-    // solver.minimize(gpcontraint, x, fx);
+    solver.minimize(gpcontraint, x, fx);
 
     // gpcontraint(x, x_grad);
     // assert(check_gradient(gpconstraint, x, x_grad));

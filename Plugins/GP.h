@@ -197,7 +197,7 @@ class GP
         VectorXd v = L.topLeftCorner(N, N).triangularView<Eigen::Lower>().solve(k_star);
 
         // 事後分布の分散
-        double sigma = rbf(x, x) - v.dot(v) + gaussian_variance;
+        double sigma = rbf(_x, _x) - v.dot(v) + gaussian_variance;
         // double sigma = var(x);
         // VectorXd sigma = (rbf(x, x) - v.dot(v) + gaussian_variance) * std;
 
