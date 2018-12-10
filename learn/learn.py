@@ -113,19 +113,18 @@ if __name__ == "__main__":
     Y = motion_to_features(Y)
     # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
     # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
-    # Y = Y[::5]
 
     kernel = GPy.kern.RBF(input_dim=2, lengthscale=None, ARD=False)
 
     Y_mean = Y.mean(0)
-
     # 分散が０のものは１でよい？
     Y_std = Y.std(0)
     Y_std[Y_std == 0] = 1.
 
-    # これおかしい？
+    Y = Y[::4]
+    
+    # これおかしい？  
     Y_normalized = np.divide(Y-Y_mean, Y_std)
-    # Y_normalized = Y-Y_mean
 
     latent_dim = 3
     # model = ScaledGPLVM(Y, 2, kernel=kernel)
@@ -133,7 +132,7 @@ if __name__ == "__main__":
     model.optimize(messages=1, max_iters=5e20)
 
     # smooth model
-    model.Y_normalized = add_gaussian_noise(Y_normalized, noise_variance=0.01)
+    model.Y_normalized = add_gaussian_noise(Y_normalized, noise_variance=0.05)
     model.unlink_parameter(model.X)
     model.optimize(messages=1, max_iters=5e20)
 
@@ -149,4 +148,6 @@ if __name__ == "__main__":
 
     # model = select_active_set(model)
 
-    save_model(model, Y, Y_mean, 1./Y_std)
+
+
+    save_model(model, Y, Y_mean, 1./Y_std, output_filename='%s_model' % args[1][:-4])
