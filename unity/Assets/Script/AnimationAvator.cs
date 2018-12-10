@@ -26,9 +26,9 @@ public class AnimationAvator : MonoBehaviour
 
     public Transform Point;
 
-    public int max_iterations = 20;
+    [Range(1, 100)]public int max_iterations = 20;
 
-    public float IKWeight = 0.5f;
+    [Range(0, 100)]public float IKWeight = 0.5f;
 
     void Awake()
     {
