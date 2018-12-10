@@ -157,7 +157,7 @@ if __name__ == "__main__":
     GPy.plotting.show(canvas, filename='wishart_metric_notebook')
 
     _, var = model.predict(model.X)
-    indices = var.flatten().argsort()[-50:]
+    indices = var.flatten().argsort()[-80:]
     X = model.X[indices]
 
     model =  GPy.core.GP(
