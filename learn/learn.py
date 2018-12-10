@@ -120,7 +120,7 @@ if __name__ == "__main__":
     # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
     # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
 
-    kernel = GPy.kern.RBF(input_dim=2, lengthscale=None, ARD=False)
+    kernel = GPy.kern.RBF(input_dim=3, lengthscale=None, ARD=False)
 
     Y_mean = Y.mean(0)
     # 分散が０のものは１でよい？
@@ -128,6 +128,7 @@ if __name__ == "__main__":
     Y_std[Y_std == 0] = 1.
 
     # Y = Y[::3]
+    # Y_std = np.ones(Y_std.shape)
 
     # これおかしい？
     Y_normalized = np.divide(Y-Y_mean, Y_std)
