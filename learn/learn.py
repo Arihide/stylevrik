@@ -139,7 +139,7 @@ if __name__ == "__main__":
     model.optimize(messages=1, max_iters=5e20)
 
     # smooth model
-    model.Y_normalized = add_gaussian_noise(Y_normalized, noise_variance=0.05)
+    model.Y_normalized = add_gaussian_noise(Y_normalized, noise_variance=0.5)
     model.unlink_parameter(model.X)
     model.optimize(messages=1, max_iters=5e20)
 
