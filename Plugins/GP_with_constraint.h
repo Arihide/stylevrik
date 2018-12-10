@@ -85,10 +85,6 @@ class GPConstraint
         segment_map[RightArm] = seg;
         segment_map[RightForeArm] = rtip;
 
-        // これやると勾配テストが通らない。。。長さが不ぞろいだとなにがまずい？->到達できない？
-        // rroot->m_translation = Vector3d(25.876, 0, 0);
-        // rtip->m_translation = Vector3d(28.40199, 0, 0);
-
         rtip->SetParent(seg);
         seg->SetParent(rroot);
 
@@ -165,22 +161,14 @@ class GPConstraint
 
         auto &translation = skeleton[id]["translation"].array_items();
 
-        // seg->m_translation = Vector3d(
-        //     translation[0].number_value(),
-        //     translation[1].number_value(),
-        //     translation[2].number_value());
         seg->m_translation = Vector3d(
-            0,
-            10,
-            0);
+            translation[0].number_value(),
+            translation[1].number_value(),
+            translation[2].number_value());
     }
 
     void SetRightGlobalGoal(Vector3d &ggoal)
     {
-        // Affine3d mat = Affine3d::Identity();
-        // mat.translation() << 20.5538, 160.075, -1.24851;
-        // rptask->m_goal = mat.inverse() * ggoal;
-
         auto &gt = skeleton[RightShoulder]["globalTranslation"].array_items();
 
         rptask->m_goal(0) = ggoal(0) - gt[0].number_value();
@@ -211,8 +199,7 @@ class GPConstraint
     {
         Vector3d q(x, y, z);
 
-        // Directly update the rotation matrix, with Rodrigues' rotation formula,
-        // to avoid singularities and allow smooth integration.
+        // update the rotation matrix, with Rodrigues' rotation formula.
 
         double theta = q.norm();
 
@@ -275,15 +262,13 @@ class GPConstraint
         x_grad = VectorXd::Zero(m_gp.dim);
 
         // 目的関数とその勾配
-        // obj = m_gp(x, x_grad);
-        x_grad.setZero(x_grad.size());
-        obj = 0;
+        obj = m_gp(x, x_grad);
 
         x_grad.segment(RightShoulder * 3, rmatrows) += -m_rjacobian.m_jacobian.transpose() * m_rjacobian.m_beta * lambda;
-        // x_grad.segment(LeftShoulder * 3, lmatrows) += -m_ljacobian.m_jacobian.transpose() * m_ljacobian.m_beta * lambda;
+        x_grad.segment(LeftShoulder * 3, lmatrows) += -m_ljacobian.m_jacobian.transpose() * m_ljacobian.m_beta * lambda;
 
         obj += m_rjacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
-        // obj += m_ljacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
+        obj += m_ljacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
 
         return obj;
     }
