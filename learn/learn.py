@@ -120,20 +120,21 @@ if __name__ == "__main__":
     # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
     # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
 
-    kernel = GPy.kern.RBF(input_dim=3, lengthscale=None, ARD=False)
+    latent_dim = 3
+
+    kernel = GPy.kern.RBF(input_dim=latent_dim, lengthscale=None, ARD=False)
 
     Y_mean = Y.mean(0)
     # 分散が０のものは１でよい？
     Y_std = Y.std(0)
     Y_std[Y_std == 0] = 1.
 
-    # Y = Y[::3]
+    Y = Y[::3]
     # Y_std = np.ones(Y_std.shape)
 
     # これおかしい？
     Y_normalized = np.divide(Y-Y_mean, Y_std)
 
-    latent_dim = 3
     # model = ScaledGPLVM(Y, 2, kernel=kernel)
     model = GPy.models.GPLVM(Y_normalized, latent_dim, kernel=kernel)
     # model = GPy.models.BCGPLVM(Y_normalized, latent_dim, kernel=kernel)
@@ -157,13 +158,15 @@ if __name__ == "__main__":
 
     GPy.plotting.show(canvas, filename='wishart_metric_notebook')
 
-    _, var = model.predict(model.X)
-    indices = var.flatten().argsort()[-80:]
-    X = model.X[indices]
+    # active set
+    # _, var = model.predict(model.X)
+    # indices = var.flatten().argsort()[-80:]
+    # X = model.X[indices]
 
-    model =  GPy.core.GP(
-        X, model.Y_normalized[indices], model.kern, model.likelihood, inference_method=model.inference_method
-    )
+    # model =  GPy.core.GP(
+    #     X, model.Y_normalized[indices], model.kern, model.likelihood, inference_method=model.inference_method
+    # )
+    # Y = Y[indices]
 
-    save_model(model, Y[indices], Y_mean, 1./Y_std,
+    save_model(model, Y, Y_mean, 1./Y_std,
                output_filename='%s_model' % args[1][:-4])
