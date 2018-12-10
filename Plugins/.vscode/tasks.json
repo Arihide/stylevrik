@@ -59,6 +59,7 @@
             },
             "args": [
                 "/EHsc",
+                "/Ox",
                 "/c",
                 "/IC:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/VC/Tools/MSVC/14.15.26726/include",
                 "/IC:/Program Files (x86)/Windows Kits/NETFXSDK/4.6.1/include/um",
