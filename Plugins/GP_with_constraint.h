@@ -19,6 +19,11 @@ class GPConstraint
 {
     // skeleton.jsonからRightArmを求めたほうが良いはず
   private:
+    int Spine = 7;
+    int Spine1 = 8;
+    int Spine2 = 9;
+    int Spine3 = 10;
+    int Neck = 11;
     int RightShoulder = 13;
     int RightArm = 14;
     int RightForeArm = 15;
@@ -41,6 +46,11 @@ class GPConstraint
     IK_QSegment *ltip;
 
     IK_QSegment *seg;
+    IK_QSegment *segs3;
+    IK_QSegment *segs2;
+    IK_QSegment *segs1;
+    IK_QSegment *segs;
+
     IK_QSegment *seg2;
 
     IK_QPositionTask *hptask;
@@ -75,9 +85,20 @@ class GPConstraint
 
         m_rootmatrix.setIdentity();
 
+        segs = CreateSegment(Spine);
+        segs1 = CreateSegment(Spine1);
+        segs2 = CreateSegment(Spine2);
+        segs3 = CreateSegment(Spine3);
+
         rroot = CreateSegment(RightShoulder);
         seg = CreateSegment(RightArm);      // RightArm
         rtip = CreateSegment(RightForeArm); // RightForeArm
+
+        SetSegmentTransform(segs, Spine1);
+        SetSegmentTransform(segs1, Spine2);
+        SetSegmentTransform(segs2, Spine3);
+        SetSegmentTransform(segs3, Neck);
+        
         SetSegmentTransform(rroot, RightArm);
         SetSegmentTransform(seg, RightForeArm);
         SetSegmentTransform(rtip, RightHand);
@@ -85,12 +106,17 @@ class GPConstraint
         segment_map[RightArm] = seg;
         segment_map[RightForeArm] = rtip;
 
+        segs3->SetParent(segs2);
+        segs2->SetParent(segs1);
+        segs1->SetParent(segs);
+
         rtip->SetParent(seg);
         seg->SetParent(rroot);
 
         rroot->SetDoFId(0);
         seg->SetDoFId(3);
         rtip->SetDoFId(6);
+        
         rroot->UpdateTransform(m_rootmatrix);
 
         Vector3d goal(1, 10, 1);
