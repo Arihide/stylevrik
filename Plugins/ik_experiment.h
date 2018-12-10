@@ -19,6 +19,7 @@ class IK
     std::list<IK_QTask *> tasks;
     IK_QJacobian m_jacobian;
     IK_QSegment *root;
+    IK_QSegment *mid;
     IK_QSegment *tip;
     IK_QPositionTask *task;
     IK_QVelocityTask *vtask;
@@ -31,9 +32,11 @@ class IK
     IK()
     {
         root = new IK_QSphericalSegment();
+        mid = new IK_QSphericalSegment();
         tip = new IK_QSphericalSegment();
 
-        tip->SetParent(root);
+        tip->SetParent(mid);
+        mid->SetParent(root);
 
         Vector3d mstart(0, 0, 0);
         Matrix3d mrest = CreateMatrix(
@@ -41,14 +44,17 @@ class IK
         Matrix3d mbasis = CreateMatrix(
             1, 0, 0, 0, 1, 0, 0, 0, 1);
         double mlength(10);
+        double mlength2(12);
 
         root->SetTransform(mstart, mrest, mbasis, mlength);
+        mid->SetTransform(mstart, mrest, mbasis, mlength);
         tip->SetTransform(mstart, mrest, mbasis, mlength);
 
         m_rootmatrix.setIdentity();
 
         root->SetDoFId(0);
-        tip->SetDoFId(3);
+        mid->SetDoFId(3);
+        tip->SetDoFId(6);
 
         root->UpdateTransform(m_rootmatrix);
 
@@ -73,7 +79,7 @@ class IK
         // }
 
         // m_jacobian.ArmMatrices(6, 3);
-        m_jacobian.ArmMatrices(9, 6);
+        m_jacobian.ArmMatrices(12, 6);
     }
 
     IK(const char *filename)
@@ -207,12 +213,14 @@ class IK
         double obj = 0;
 
         UpdateSegment(root, x(0), x(1), x(2));
-        UpdateSegment(tip, x(3), x(4), x(5));
+        UpdateSegment(mid, x(3), x(4), x(5));
+        UpdateSegment(tip, x(6), x(7), x(8));
 
         root->UpdateTransform(m_rootmatrix);
 
         root->SetDoFId(0);
-        tip->SetDoFId(3);
+        mid->SetDoFId(3);
+        tip->SetDoFId(6);
         task->ComputeExpMapJacobian(m_jacobian, x);
         // root->SetDoFId(6);
         // tip->SetDoFId(9);
