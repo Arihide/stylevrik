@@ -94,27 +94,26 @@ int main()
 
     // GPパラメータの読み込み
     GP gp;
-    // gp.load("testmodel.json");
 
     // 読み込んだパラメータのテスト
     // GPの尤度の勾配のテスト
-    // x = VectorXd::Ones(gp.dim);
-    // x_grad = VectorXd::Ones(gp.dim);
-    // assert(check_gradient(gp, x, x_grad));
-    // solver.minimize(gp, x, fx);
-    // cout << x << endl;
 
     // 別のモデルでもテスト
-    // gp.load("expmap_model_reduce.json");
     gp.load("testmodel_reduced.json");
-    // gp.load("testmodel_3dim.json");
-    // gp.load("testmodel.1.json");
-    // gp.load("testmodel_with_vel.json");
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
+
     // 勾配の導関数が正しいか？
     assert(check_gradient(gp, x, x_grad));
     // solver.minimize(gp, x, fx);
+
+    x.resize(3);
+    x << 0.1, 0.2, 0.3;
+    gp.load("walk00_rmfinger_model.json");
+    gp.update_k_star(x);
+    // cout << gp.k_star << endl;
+    cout << gp.f() - gp.mean << endl;
+    // cout << gp.sigma(x) << endl;
 
     // IKのテスト
     // IK ik("skeleton.json");

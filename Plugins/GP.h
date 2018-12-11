@@ -34,7 +34,7 @@ class GP
     MatrixXd L;
     // 教師データ行列(N, y_dim)
     MatrixXd Y;
-    // alpha=L*Y 事後確率を求めるときに簡単になる
+    // alpha=L*Y=Y^T * K^-1 事後確率を求めるときに簡単になる
     MatrixXd alpha;
     // 新しい潜在変数xと、教師データから得られるカーネル関数のベクトル
     VectorXd k_star;
@@ -47,7 +47,7 @@ class GP
     // RBFカーネルはこれで間違いないはず
     double rbf(const VectorXd &x1, const VectorXd &x2)
     {
-        return kernel_variance * exp(-0.5 * (x1 - x2).squaredNorm() / (kernel_lengthscale));
+        return kernel_variance * exp(-0.5 * (x1 - x2).squaredNorm() / (kernel_lengthscale * kernel_lengthscale));
     }
 
     // GPyで生成したパラメータの読み込み。
@@ -72,6 +72,7 @@ class GP
 
         Y.resize(N, y_dim);
 
+        inputs.clear();
         for (int i = 0; i < N; i++)
         {
             VectorXd *x = new VectorXd(x_dim);
@@ -93,7 +94,7 @@ class GP
             mean(i) = arrMean[i].number_value();
             st(i) = arrStd[i].number_value();
         }
-        va = st.cwiseProduct(st);
+        va.noalias() = st.cwiseProduct(st);
 
         kernel_variance = json["kernel"]["variance"][0].number_value();
         kernel_lengthscale = json["kernel"]["lengthscale"][0].number_value();
@@ -126,6 +127,9 @@ class GP
         K_inv = K_inv.inverse();
 
         k_star.resize(N);
+
+        ifs.close();
+
     }
 
     void update_k_star(const VectorXd &x_star)
@@ -136,6 +140,28 @@ class GP
         }
     }
 
+    VectorXd f()
+    {
+        return (k_star.transpose() * K_inv * Y).transpose() + mean;
+        // return (alpha.transpose() * k_star) + mean;
+    }
+
+    double sigma(VectorXd x)
+    {
+        VectorXd v = L.topLeftCorner(N, N).triangularView<Eigen::Lower>().solve(k_star);
+        return rbf(x, x) - v.dot(v) + gaussian_variance;
+    }
+
+    MatrixXd dk_stardx(VectorXd x){
+        MatrixXd _dk_stardx;
+        _dk_stardx.resize(N, x_dim);
+        for (int ix = 0; ix < N; ix++)
+        {
+            _dk_stardx.row(ix) = ((*inputs[ix]) - x) * k_star(ix) / (kernel_lengthscale * kernel_lengthscale);
+        }
+        return _dk_stardx;
+    }
+
     double operator()(const VectorXd &x, VectorXd &x_grad)
     {
         VectorXd _x = x.tail(x_dim);
@@ -143,43 +169,34 @@ class GP
 
         update_k_star(_x);
 
-        VectorXd v = L.topLeftCorner(N, N).triangularView<Eigen::Lower>().solve(k_star);
-
         // 事後分布の分散
-        double sigma = rbf(_x, _x) - v.dot(v) + gaussian_variance;
-        // VectorXd sigma = (rbf(x, x) - v.dot(v) + gaussian_variance) * std;
+        double _sigma = sigma(_x);
 
-        // assert(sigma > 0)
+        // assert(_sigma > 0)
 
         // 事後分布の平均
-        VectorXd _f = (alpha.transpose() * k_star) + mean;
+        VectorXd _f = f();
 
         // yの勾配
-        VectorXd y_grad = (_y - _f).cwiseProduct(va) / sigma;
+        VectorXd y_grad = (_y - _f).cwiseProduct(va) / _sigma;
 
         // p(y|x)と相似な値
-        double pyx = (_y - _f).cwiseProduct(st).squaredNorm() / sigma;
+        double pyx = (_y - _f).cwiseProduct(st).squaredNorm() / _sigma;
 
         // Shape: (N, dim_x)
-        MatrixXd dk_stardx;
-        dk_stardx.resize(N, x_dim);
-        for (int ix = 0; ix < N; ix++)
-        {
-            dk_stardx.row(ix) = ((*inputs[ix]) - x.tail(x_dim)) * k_star(ix) / (kernel_lengthscale);
-        }
+        MatrixXd _dk_stardx = dk_stardx(_x);
 
         // Shape: (dim_y, dim_x)
-        MatrixXd _dfdx = alpha.transpose() * dk_stardx;
+        MatrixXd _dfdx = alpha.transpose() * _dk_stardx;
 
         // (dim_x)
-        VectorXd _dsigmadx = -2. * k_star.transpose() * K_inv * dk_stardx;
+        VectorXd _dsigmadx = -2. * k_star.transpose() * K_inv * _dk_stardx;
 
         // xの勾配
-        x_grad.tail(x_dim) = -_dfdx.transpose() * y_grad + _dsigmadx * (y_dim - pyx) / (2. * sigma) + _x;
+        x_grad.tail(x_dim) = -_dfdx.transpose() * y_grad + _dsigmadx * (y_dim - pyx) / (2. * _sigma) + _x;
         x_grad.head(y_dim) = y_grad;
-        // x_grad.head(y_dim) = (y_grad + mean).cwiseProduct(st);
 
         // 尤度
-        return (pyx + (y_dim * log(sigma)) + _x.squaredNorm()) / 2.;
+        return (pyx + (y_dim * log(_sigma)) + _x.squaredNorm()) / 2.;
     }
 };

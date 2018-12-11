@@ -116,7 +116,7 @@ if __name__ == "__main__":
     # データの下処理
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
-    Y = motion_to_features(Y)
+    # Y = motion_to_features(Y)
     # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
     # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
 
@@ -140,13 +140,18 @@ if __name__ == "__main__":
     # model = GPy.models.BCGPLVM(Y_normalized, latent_dim, kernel=kernel)
     model.optimize(messages=1, max_iters=5e20)
 
+    # print(model._raw_predict(np.array([[0.1, 0.2, 0.3]])))
+    print(model.predict(np.array([[0.1, 0.2, 0.3]]))[0][0] + Y_mean)
+
+    # print(model.kern.K(model._predictive_variable,
+    #                    np.array([[0.1, 0.2, 0.3]])))
+
     # smooth model
-    model.Y_normalized = add_gaussian_noise(Y_normalized, noise_variance=0.5)
-    model.unlink_parameter(model.X)
-    model.optimize(messages=1, max_iters=5e20)
+    # model.Y_normalized = add_gaussian_noise(Y_normalized, noise_variance=0.5)
+    # model.unlink_parameter(model.X)
+    # model.optimize(messages=1, max_iters=5e20)
 
     # model = select_active_set(model)
-    model.optimize()
 
     figure = GPy.plotting.plotting_library().figure(1, 2,
                                                     shared_yaxes=True,
@@ -156,7 +161,7 @@ if __name__ == "__main__":
     canvas = model.plot_latent(labels=np.zeros(
         model.Y_normalized.shape[0]), figure=figure, legend=False)
 
-    GPy.plotting.show(canvas, filename='wishart_metric_notebook')
+    # GPy.plotting.show(canvas, filename='wishart_metric_notebook')
 
     # active set
     # _, var = model.predict(model.X)
