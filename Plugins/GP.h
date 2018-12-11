@@ -136,54 +136,6 @@ class GP
         }
     }
 
-    // 事後分布の平均
-    VectorXd f(const VectorXd &x)
-    {
-        VectorXd _f = (alpha.transpose() * k_star);
-        // VectorXd _f = (alpha.transpose() * k_star).cwiseProduct(std) + mean;
-        return _f;
-    }
-
-    // 事後分布の分散
-    double var(const VectorXd &x)
-    {
-        VectorXd v = L.topLeftCorner(N, N).triangularView<Eigen::Lower>().solve(k_star);
-
-        return rbf(x, x) - v.dot(v) + gaussian_variance;
-    }
-
-    MatrixXd dfdx(const VectorXd &x)
-    {
-
-        update_k_star(x.tail(x_dim));
-
-        // Shape: (N, dim_x)
-        MatrixXd dk_stardx;
-        dk_stardx.resize(N, x_dim);
-        for (int ix = 0; ix < N; ix++)
-        {
-            dk_stardx.row(ix) = ((*inputs[ix]) - x.tail(x_dim)) * k_star(ix) / (kernel_lengthscale);
-        }
-
-        return alpha.transpose() * dk_stardx;
-    }
-
-    VectorXd dsigmadx(const VectorXd &x)
-    {
-
-        update_k_star(x.tail(x_dim));
-
-        // Shape: (N, dim_x)
-        MatrixXd dk_stardx;
-        dk_stardx.resize(N, x_dim);
-        for (int ix = 0; ix < N; ix++)
-        {
-            dk_stardx.row(ix) = ((*inputs[ix]) - x.tail(x_dim)) * k_star(ix) / (kernel_lengthscale);
-        }
-
-        return -2. * k_star.transpose() * K_inv * dk_stardx;
-    }
-
     double operator()(const VectorXd &x, VectorXd &x_grad)
     {
         VectorXd _x = x.tail(x_dim);
@@ -195,14 +147,12 @@ class GP
 
         // 事後分布の分散
         double sigma = rbf(_x, _x) - v.dot(v) + gaussian_variance;
-        // double sigma = var(x);
         // VectorXd sigma = (rbf(x, x) - v.dot(v) + gaussian_variance) * std;
 
         // assert(sigma > 0)
 
         // 事後分布の平均
         VectorXd _f = (alpha.transpose() * k_star) + mean;
-        // VectorXd _f = f(x);
 
         // yの勾配
         VectorXd y_grad = (_y - _f).cwiseProduct(va) / sigma;
@@ -219,11 +169,9 @@ class GP
         }
 
         // Shape: (dim_y, dim_x)
-        // MatrixXd _dfdx = dfdx(x);
         MatrixXd _dfdx = alpha.transpose() * dk_stardx;
 
         // (dim_x)
-        // VectorXd _dsigmadx = dsigmadx(x);
         VectorXd _dsigmadx = -2. * k_star.transpose() * K_inv * dk_stardx;
 
         // xの勾配
