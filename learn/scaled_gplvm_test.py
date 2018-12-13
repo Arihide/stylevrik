@@ -11,7 +11,7 @@ if __name__ == "__main__":
     Y = np.asarray(br.motions)
     kernel = GPy.kern.RBF(2)
 
-    m = ScaledGPLVM(Y, 2, kernel=kernel)
+    m = ScaledGPLVM(Y-Y.mean(0), 2, kernel=kernel)
     # m.unlink_parameter(m.likelihood)
     # m.unlink_parameter(m.kern)
 

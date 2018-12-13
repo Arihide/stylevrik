@@ -63,16 +63,12 @@ class ScaledGPLVM(GP):
         self.link_parameter(self.X, index=0)
         self.link_parameter(self.S)
 
-    # def log_likelihood(self):
-    #     return super(ScaledGPLVM, self).log_likelihood()
+    def log_likelihood(self):
+        return super(ScaledGPLVM, self).log_likelihood() - np.log(self.kern.variance) + np.log(self.kern.lengthscale) + np.log(self.likelihood.variance) + self.Y.shape[0] * np.log(self.S).sum()
 
     def parameters_changed(self):
         self.Y_normalized = self.S * self.Y
 
-        super(ScaledGPLVM, self).parameters_changed()
-
-        self.X.gradient = self.kern.gradients_X(
-            self.grad_dict['dL_dK'], self.X, None)
 
         # A = (2 * self.S * self.Y).T.reshape(self.Y.shape[1], self.Y.shape[0], 1)
         # B = self.Y.T.reshape(self.Y.shape[1], 1, self.Y.shape[0])
@@ -88,8 +84,19 @@ class ScaledGPLVM(GP):
 
         alpha, _ = dpotrs(LW, YYT_factor, lower=1)
 
-        grad = -1. * np.sum(self.S * alpha * YYT_factor, axis=0)
+        grad = -1. * np.diag(np.matmul((self.S * alpha).T, YYT_factor)) + self.Y.shape[0] / self.S
+        # print((alpha).shape)
+        # print((alpha * YYT_factor).shape)
 
         # grad = -self.S * np.diag(np.dot(np.dot(self.Y.T, np.linalg.inv(self.kern.K(self.X))), self.Y))
 
         self.S.gradient = grad
+
+        super(ScaledGPLVM, self).parameters_changed()
+
+        self.likelihood.variance.gradient -= self.likelihood.variance
+        self.kern.variance.gradient -= 1 / self.kern.variance
+        self.kern.lengthscale.gradient -= self.kern.lengthscale
+
+        self.X.gradient = self.kern.gradients_X(
+            self.grad_dict['dL_dK'], self.X, None)

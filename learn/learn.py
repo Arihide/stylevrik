@@ -132,11 +132,11 @@ if __name__ == "__main__":
     Y_std = Y.std(0)
     Y_std[Y_std == 0] = 1.
 
-    Y = Y[::3]
+    # Y = Y[::3]
     # Y_std = np.ones(Y_std.shape)
 
     # これおかしい？
-    Y_normalized = np.divide(Y-Y_mean, Y_std)
+    # Y_normalized = np.divide(Y-Y_mean, Y_std)
 
     model = ScaledGPLVM(Y-Y_mean, latent_dim, kernel=kernel)
     # model = GPy.models.GPLVM(Y_normalized, latent_dim, kernel=kernel)
@@ -145,9 +145,6 @@ if __name__ == "__main__":
 
     # print(model._raw_predict(np.array([[0.1, 0.2, 0.3]])))
     # print(model.predict(np.array([[0.1, 0.2, 0.3]]))[0][0] + Y_mean)
-
-    m = GPy.core.GP(model.X, model.Y_normalized, model.kern, model.likelihood)
-    print(m.predict(np.array([[0.1, 0.2, 0.3]])))
 
     # print(model.kern.K(model._predictive_variable,
     #                    np.array([[0.1, 0.2, 0.3]])))
@@ -179,5 +176,5 @@ if __name__ == "__main__":
     # )
     # Y = Y[indices]
 
-    save_model(model, Y, Y_mean, 1./Y_std,
+    save_model(model, Y, Y_mean, Y_std,
                output_filename='%s_model' % args[1][:-4])
