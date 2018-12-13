@@ -81,7 +81,10 @@ def save_model(model, Y, mean, std, output_filename='testmodel'):
     output_dict["kernel"] = model.kern.to_dict()
     output_dict["likelihood"] = model.likelihood.to_dict()
     output_dict["mean"] = mean.tolist()
-    output_dict["std"] = std.tolist()
+    # output_dict["std"] = std.tolist()
+
+    if model.S is not None:
+        output_dict["std"] = model.S.tolist()
 
     # output_dict["class"] = "GPy.core.GP"
     # output_dict["name"] = "stylevrikmodel"
@@ -135,13 +138,16 @@ if __name__ == "__main__":
     # これおかしい？
     Y_normalized = np.divide(Y-Y_mean, Y_std)
 
-    # model = ScaledGPLVM(Y, 2, kernel=kernel)
-    model = GPy.models.GPLVM(Y_normalized, latent_dim, kernel=kernel)
+    model = ScaledGPLVM(Y-Y_mean, latent_dim, kernel=kernel)
+    # model = GPy.models.GPLVM(Y_normalized, latent_dim, kernel=kernel)
     # model = GPy.models.BCGPLVM(Y_normalized, latent_dim, kernel=kernel)
     model.optimize(messages=1, max_iters=5e20)
 
     # print(model._raw_predict(np.array([[0.1, 0.2, 0.3]])))
-    print(model.predict(np.array([[0.1, 0.2, 0.3]]))[0][0] + Y_mean)
+    # print(model.predict(np.array([[0.1, 0.2, 0.3]]))[0][0] + Y_mean)
+
+    m = GPy.core.GP(model.X, model.Y_normalized, model.kern, model.likelihood)
+    print(m.predict(np.array([[0.1, 0.2, 0.3]])))
 
     # print(model.kern.K(model._predictive_variable,
     #                    np.array([[0.1, 0.2, 0.3]])))
@@ -153,13 +159,13 @@ if __name__ == "__main__":
 
     # model = select_active_set(model)
 
-    figure = GPy.plotting.plotting_library().figure(1, 2,
-                                                    shared_yaxes=True,
-                                                    shared_xaxes=True
-                                                    )
+    # figure = GPy.plotting.plotting_library().figure(1, 2,
+    #                                                 shared_yaxes=True,
+    #                                                 shared_xaxes=True
+    #                                                 )
 
-    canvas = model.plot_latent(labels=np.zeros(
-        model.Y_normalized.shape[0]), figure=figure, legend=False)
+    # canvas = model.plot_latent(labels=np.zeros(
+    #     model.Y_normalized.shape[0]), figure=figure, legend=False)
 
     # GPy.plotting.show(canvas, filename='wishart_metric_notebook')
 

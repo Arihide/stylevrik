@@ -4,6 +4,8 @@ from GPy.core import GP, Param, Mapping, Param
 from GPy.likelihoods import Gaussian
 from GPy.util.initialization import initialize_latent
 from GPy.mappings import Linear
+from GPy.util import diag
+from GPy.util.linalg import pdinv, dpotrs, tdot
 
 
 class Scale(Mapping):
@@ -12,7 +14,7 @@ class Scale(Mapping):
         super(Scale, self).__init__(
             input_dim=input_dim, output_dim=input_dim, name=name)
         self.S = Param('S', np.random.randn(self.input_dim))
-        self.link_parameter(self.S)
+        # self.link_parameter(self.S)
 
     def f(self, X):
         return X * self.S
@@ -42,22 +44,52 @@ class Scale(Mapping):
     def _build_from_input_dict(mapping_class, input_dict):
         import copy
 
+
 class ScaledGPLVM(GP):
 
     def __init__(self, Y, input_dim=2, kernel=None):
         X, fracs = initialize_latent('PCA', input_dim, Y)
-        self.mapping = Scale(Y.shape[0])
+        # self.mapping = Scale(Y.shape[1])
+        self.S = Param('S', np.ones(Y.shape[1]))
 
         likelihood = Gaussian()
 
-        super(ScaledGPLVM, self).__init__(X, Y, kernel, likelihood, name="ScaledGPLVM")
+        super(ScaledGPLVM, self).__init__(
+            X, Y, kernel, likelihood, name="ScaledGPLVM")
+
+        self.Y_raw = Y
 
         self.X = Param('latent_mean', X)
         self.link_parameter(self.X, index=0)
+        self.link_parameter(self.S)
+
+    # def log_likelihood(self):
+    #     return super(ScaledGPLVM, self).log_likelihood()
 
     def parameters_changed(self):
-        # self.Y = self.mapping.f(self.Y)
+        self.Y_normalized = self.S * self.Y
+
         super(ScaledGPLVM, self).parameters_changed()
+
         self.X.gradient = self.kern.gradients_X(
             self.grad_dict['dL_dK'], self.X, None)
-        # self.mapping.update_gradients()
+
+        # A = (2 * self.S * self.Y).T.reshape(self.Y.shape[1], self.Y.shape[0], 1)
+        # B = self.Y.T.reshape(self.Y.shape[1], 1, self.Y.shape[0])
+
+        # grad = np.sum(self.grad_dict['dL_dK'] * np.matmul(A, B), axis=(1,2)) / 66
+
+        YYT_factor = self.Y
+
+        Ky = self.kern.K(self.X).copy()
+        diag.add(Ky, self.likelihood.gaussian_variance(self.Y_metadata)+1e-8)
+
+        Wi, LW, LWi, W_logdet = pdinv(Ky)
+
+        alpha, _ = dpotrs(LW, YYT_factor, lower=1)
+
+        grad = -1. * np.sum(self.S * alpha * YYT_factor, axis=0)
+
+        # grad = -self.S * np.diag(np.dot(np.dot(self.Y.T, np.linalg.inv(self.kern.K(self.X))), self.Y))
+
+        self.S.gradient = grad
