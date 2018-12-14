@@ -150,10 +150,10 @@ if __name__ == "__main__":
     #                    np.array([[0.1, 0.2, 0.3]])))
 
     # smooth model
-    model.Y = add_gaussian_noise(model.Y, noise_variance=0.05)
-    model.unlink_parameter(model.X)
-    model.unlink_parameter(model.S)
-    model.optimize(messages=1, max_iters=5e20)
+    # model.Y = add_gaussian_noise(model.Y, noise_variance=0.05)
+    # model.unlink_parameter(model.X)
+    # model.unlink_parameter(model.S)
+    # model.optimize(messages=1, max_iters=5e20)
 
     # model = select_active_set(model)
 
