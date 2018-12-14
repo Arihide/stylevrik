@@ -9,10 +9,8 @@ if __name__ == "__main__":
     br.read()
 
     Y = np.asarray(br.motions)
-    kernel = GPy.kern.RBF(2)
+    kernel = GPy.kern.RBF(3)
 
-    m = ScaledGPLVM(Y-Y.mean(0), 2, kernel=kernel)
-    # m.unlink_parameter(m.likelihood)
-    # m.unlink_parameter(m.kern)
+    m = ScaledGPLVM(Y-Y.mean(0), 3, kernel=kernel)
 
     print(m.checkgrad())
