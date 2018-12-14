@@ -45,7 +45,7 @@ class GP
     std::vector<VectorXd *> inputs;
 
     // RBFカーネルはこれで間違いないはず
-    double rbf(const VectorXd &x1, const VectorXd &x2)
+    inline double rbf(const VectorXd &x1, const VectorXd &x2)
     {
         return kernel_variance * exp(-0.5 * (x1 - x2).squaredNorm() / (kernel_lengthscale * kernel_lengthscale));
     }
@@ -140,19 +140,19 @@ class GP
         }
     }
 
-    VectorXd f()
+    inline VectorXd f()
     {
         return (k_star.transpose() * K_inv * Y).transpose() + mean;
         // return (alpha.transpose() * k_star) + mean;
     }
 
-    double sigma(VectorXd x)
+    inline double sigma(const VectorXd &x)
     {
         VectorXd v = L.topLeftCorner(N, N).triangularView<Eigen::Lower>().solve(k_star);
         return rbf(x, x) - v.dot(v) + gaussian_variance;
     }
 
-    MatrixXd dk_stardx(VectorXd x){
+    inline MatrixXd dk_stardx(const VectorXd &x){
         MatrixXd _dk_stardx;
         _dk_stardx.resize(N, x_dim);
         for (int ix = 0; ix < N; ix++)

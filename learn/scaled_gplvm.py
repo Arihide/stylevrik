@@ -67,7 +67,7 @@ class ScaledGPLVM(GP):
         return super(ScaledGPLVM, self).log_likelihood() +\
             self.Y.shape[0] * np.log(self.S).sum() -\
             0.5 * np.sum(self.X**2) -\
-            np.log(self.kern.variance) + np.log(self.kern.lengthscale) + np.log(self.likelihood.variance)
+            np.log(self.kern.variance) + 2 * np.log(self.kern.lengthscale) + np.log(self.likelihood.variance)
 
 
     def parameters_changed(self):
@@ -104,7 +104,7 @@ class ScaledGPLVM(GP):
 
         self.likelihood.variance.gradient += 1 / self.likelihood.variance
         self.kern.variance.gradient -= 1 / self.kern.variance
-        self.kern.lengthscale.gradient += 1 / self.kern.lengthscale
+        self.kern.lengthscale.gradient += 2 / self.kern.lengthscale
 
         self.X.gradient = self.kern.gradients_X(
             self.grad_dict['dL_dK'], self.X, None) - self.X
