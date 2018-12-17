@@ -81,10 +81,10 @@ def save_model(model, Y, mean, std, output_filename='testmodel'):
     output_dict["kernel"] = model.kern.to_dict()
     output_dict["likelihood"] = model.likelihood.to_dict()
     output_dict["mean"] = mean.tolist()
-    # output_dict["std"] = std.tolist()
+    output_dict["std"] = std.tolist()
 
-    if model.S is not None:
-        output_dict["std"] = model.S.tolist()
+    # if model.S is not None:
+    #     output_dict["std"] = model.S.tolist()
 
     # output_dict["class"] = "GPy.core.GP"
     # output_dict["name"] = "stylevrikmodel"
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     # データの下処理
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
-    Y = motion_to_features(Y)
+    # Y = motion_to_features(Y)
     # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
     # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
 
@@ -128,9 +128,6 @@ if __name__ == "__main__":
     kernel = GPy.kern.RBF(input_dim=latent_dim, lengthscale=None, ARD=False)
 
     Y_mean = Y.mean(0)
-    # 分散が０のものは１でよい？
-    Y_std = Y.std(0)
-    Y_std[Y_std == 0] = 1.
 
     # Y = Y[::3]
     # Y_std = np.ones(Y_std.shape)
@@ -166,16 +163,17 @@ if __name__ == "__main__":
     #     model.Y_normalized.shape[0]), figure=figure, legend=False)
 
     # GPy.plotting.show(canvas, filename='wishart_metric_notebook')
+    Y_std = model.S
 
     # active set
-    # _, var = model.predict(model.X)
-    # indices = var.flatten().argsort()[-80:]
-    # X = model.X[indices]
+    _, var = model.predict(model.X)
+    indices = var.flatten().argsort()[-80:]
+    X = model.X[indices]
 
-    # model =  GPy.core.GP(
-    #     X, model.Y_normalized[indices], model.kern, model.likelihood, inference_method=model.inference_method
-    # )
-    # Y = Y[indices]
+    model =  GPy.core.GP(
+        X, model.Y_normalized[indices], model.kern, model.likelihood, inference_method=model.inference_method
+    )
+    Y = Y[indices]
 
     save_model(model, Y, Y_mean, Y_std,
                output_filename='%s_model' % args[1][:-4])

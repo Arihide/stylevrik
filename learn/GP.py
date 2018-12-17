@@ -27,7 +27,7 @@ class GP:
         else:
             assert parameter_priors.size == (self.kernel.nparams+1)
             self.parameter_prior_widths = np.array(parameter_priors).flatten()
-        self.beta = 0.1
+        self.beta = 1
         self.update()
         # constant in the marginal. precompute for convenience.
         self.n2ln2pi = 0.5*self.Ydim*self.N*np.log(2*np.pi)
@@ -39,8 +39,8 @@ class GP:
         # normalise...
         self.xmean = self.X.mean(0)
         self.xstd = self.X.std(0)
-        self.X -= self.xmean
-        self.X /= self.xstd
+        # self.X -= self.xmean
+        # self.X /= self.xstd
 
     def setY(self, newY):
         self.Y = newY.copy()
@@ -49,8 +49,8 @@ class GP:
         # normalise...
         self.ymean = self.Y.mean(0)
         self.ystd = self.Y.std(0)
-        self.Y -= self.ymean
-        self.Y /= self.ystd
+        # self.Y -= self.ymean
+        # self.Y /= self.ystd
 
     def hyper_prior(self):
         """return the log of the current hyper paramters under their prior"""
