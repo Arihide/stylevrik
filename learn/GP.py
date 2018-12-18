@@ -54,11 +54,11 @@ class GP:
 
     def hyper_prior(self):
         """return the log of the current hyper paramters under their prior"""
-        return -0.5*np.dot(self.parameter_prior_widths, np.square(self.get_params()))
+        return -np.dot(self.parameter_prior_widths, self.get_params())
 
     def hyper_prior_grad(self):
         """return the gradient of the (log of the) hyper prior for the current parameters"""
-        return -self.parameter_prior_widths*self.get_params()
+        return -self.parameter_prior_widths / np.r_[self.kernel.alpha, self.kernel.gamma, self.beta]
 
     def get_params(self):
         """return the parameters of this GP: that is the kernel parameters and the beta value"""

@@ -19,10 +19,10 @@ class GP
     int N;
 
     // 以下3つのパラメータはモデルの滑らかさに影響する。最適化計算中に変更することを検討する
-    double kernel_variance;
+    double kernel_variance; // = α
     // kernel一つ一つにlengthscaleを割り当てることも検討する
-    double kernel_lengthscale;
-    double gaussian_variance;
+    double kernel_lengthscale; // = γ^{-0.5}
+    double gaussian_variance; // = β^{-1}
 
     double smooth_kernel_variance;
     double smooth_kernel_lengthscale;

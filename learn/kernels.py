@@ -9,8 +9,8 @@ class RBF:
 	k(x_i,x_j) = \alpha \exp \{ -\gamma ||x_1-x_2||^2 \}
 	"""
 	def __init__(self,alpha,gamma):
-		self.alpha = np.exp(alpha)
-		self.gamma = np.exp(gamma)
+		self.alpha = alpha
+		self.gamma = gamma
 		self.nparams = 2
 		
 	def set_params(self,new_params):

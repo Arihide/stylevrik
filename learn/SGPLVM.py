@@ -7,6 +7,7 @@ from scipy import optimize
 
 from bvh_reader import BVHReader
 
+from mathfunc import eulers_to_expmap
 
 class SGPLVM:
     """ TODO: this should inherrit a GP, not contain an instance of it..."""
@@ -29,11 +30,11 @@ class SGPLVM:
     def learn(self, niters):
         for i in range(niters):
             self.optimise_GP_kernel()
-            # self.optimise_latents()
+            self.optimise_latents()
             # self.optimize_scale()
-            # self.GP.Y = (self.orgY - self.Ymean)
-            # self.GP.update()
-            # self.W = np.sqrt(self.N / np.sum(self.GP.A * self.GP.Y), axis=0)
+            self.GP.Y = (self.orgY - self.Ymean)
+            self.GP.update()
+            self.W = np.sqrt(self.N / np.sum(self.GP.A * self.GP.Y, axis=0))
 
     def optimise_GP_kernel(self):
         """optimisation of the GP's kernel parameters"""
@@ -89,11 +90,14 @@ class SGPLVM:
 
 
 if __name__ == "__main__":
-    Y = np.random.normal(0, 100, (30, 5))
+    # Y[10] = np.zeros(5)
+    # Y = np.random.normal(0, 0.5, (30,5))
 
     br = BVHReader('bvh/walk00_rmfinger.bvh')
     br.read()
-    # Y = np.asarray(br.motions)
+    Y = np.asarray(br.motions)
+    Y = np.asarray(eulers_to_expmap(Y))
+    Y += np.random.normal(1, 0.05, Y.shape)
     # Y = Y[:, 3:]
     # Y = Y[::3]
 
@@ -102,7 +106,7 @@ if __name__ == "__main__":
     # print(optimize.check_grad(model.ll, model.ll_grad, np.random.rand(2), (1,)))
     # print(optimize.check_grad(model.lls, model.lls_grad, np.random.rand(model.GP.Ydim)))
 
-    model.learn(1000)
+    model.learn(100)
 
     def save_model(model, output_filename):
         import json
@@ -112,15 +116,17 @@ if __name__ == "__main__":
         output_dict["Y"] = model.GP.Y.tolist()
         output_dict["kernel"] = {
             "variance": model.GP.kernel.alpha,
-            "lengthscale": model.GP.kernel.gamma
+            "lengthscale": 1 / np.sqrt(model.GP.kernel.gamma)
         }
         output_dict["likelihood"] = {
             "variance": 1/model.GP.beta,
         }
         output_dict["W"] = model.W.tolist()
-        output_dict["mean"] = model.GP.ymean.tolist()
+        output_dict["mean"] = model.Ymean.tolist()
 
         with open(output_filename + ".json", "w") as outfile:
             json.dump(output_dict, outfile, indent=2)
+
+    print(Y.std(0))
 
     save_model(model, 'test')
