@@ -127,8 +127,11 @@ class GP
         // alpha = Ky.llt().solve(Y);
 
         // 逆行列
-        K_inv = L * L.transpose();
-        K_inv = K_inv.inverse();
+        // K_inv = L * L.transpose();
+        // K_inv = K_inv.inverse();
+        K_inv = MatrixXd::Identity(N, N);
+        L.triangularView<Lower>().solveInPlace(K_inv);
+        L.triangularView<Lower>().adjoint().solveInPlace(K_inv);
 
         k_star.resize(N);
 
