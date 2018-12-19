@@ -29,27 +29,25 @@ class SGPLVM:
 
     def learn(self, niters):
         for i in range(niters):
+            self.GP.Y = (self.orgY - self.Ymean) * self.W
             self.optimise_GP_kernel()
             self.optimise_latents()
             # self.optimize_scale()
-            self.GP.Y = (self.orgY - self.Ymean)
-            self.GP.update()
-            self.W = np.sqrt(self.N / np.sum(self.GP.A * self.GP.Y, axis=0))
+            # self.GP.Y = (self.orgY - self.Ymean)
+            # self.GP.update()
+            self.W = np.sqrt(self.N / np.sum(self.orgY * np.dot(self.GP.Kinv, self.orgY), axis=0))
 
     def optimise_GP_kernel(self):
         """optimisation of the GP's kernel parameters"""
-        self.GP.Y = (self.orgY - self.Ymean) * self.W
         self.GP.update()
         self.GP.find_kernel_params()
         print(self.GP.marginal(), 0.5*np.sum(np.square(self.GP.X)))
 
     def lls(self, s):
-        self.GP.Y = (self.orgY - self.Ymean) * s
         self.GP.update()
         return -self.GP.marginal() + self.N * np.sum(np.log(s))
 
     def lls_grad(self, s):
-        self.GP.Y = (self.orgY - self.Ymean)
         self.GP.update()
         return s * (self.GP.A * self.GP.Y).sum(0) + self.N / s
 
@@ -91,13 +89,13 @@ class SGPLVM:
 
 if __name__ == "__main__":
     # Y[10] = np.zeros(5)
-    # Y = np.random.normal(0, 0.5, (30,5))
+    Y = np.random.normal(0, 0.5, (30,5))
 
     br = BVHReader('bvh/walk00_rmfinger.bvh')
     br.read()
-    Y = np.asarray(br.motions)
-    Y = np.asarray(eulers_to_expmap(Y))
-    Y += np.random.normal(1, 0.05, Y.shape)
+    # Y = np.asarray(br.motions)
+    # Y = np.asarray(eulers_to_expmap(Y))
+    # Y += np.random.normal(1, 0.05, Y.shape)
     # Y = Y[:, 3:]
     # Y = Y[::3]
 
@@ -106,7 +104,7 @@ if __name__ == "__main__":
     # print(optimize.check_grad(model.ll, model.ll_grad, np.random.rand(2), (1,)))
     # print(optimize.check_grad(model.lls, model.lls_grad, np.random.rand(model.GP.Ydim)))
 
-    model.learn(100)
+    model.learn(10)
 
     def save_model(model, output_filename):
         import json

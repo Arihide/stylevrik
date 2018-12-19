@@ -34,7 +34,7 @@ class GP
     MatrixXd L;
     // 教師データ行列(N, y_dim)
     MatrixXd Y;
-    // alpha=L*Y=Y^T * K^-1 事後確率を求めるときに簡単になる
+    // alpha=Y^T * K^-1 事後確率を求めるときに簡単になる
     MatrixXd alpha;
     // 新しい潜在変数xと、教師データから得られるカーネル関数のベクトル
     VectorXd k_star;
@@ -101,11 +101,15 @@ class GP
         gaussian_variance = json["likelihood"]["variance"][0].number_value();
 
         // 共分散行列（カーネル行列）の計算
-        // 対称行列なので下半分だけ求めればよいはずー＞これからやる
+        // 対称行列なので下半分だけ求めればよいはず
         K.resize(N, N);
         for (int i = 0; i < N; i++)
         {
-            for (int j = 0; j < N; j++)
+            // for (int j = 0; j < N; j++)
+            // {
+            //     K(i, j) = rbf((*inputs[i]), (*inputs[j]));
+            // }
+            for (int j = 0; j <= i; j++)
             {
                 K(i, j) = rbf((*inputs[i]), (*inputs[j]));
             }
@@ -115,16 +119,19 @@ class GP
         Ky.diagonal() += (gaussian_variance + 1e-8) * VectorXd::Ones(N);
 
         L.resize(N, N);
-        L.topLeftCorner(N, N) = Ky.topLeftCorner(N, N).selfadjointView<Eigen::Lower>().llt().matrixL();
+        L = Ky.selfadjointView<Lower>().ldlt().matrixL();
 
         alpha.resize(N, y_dim);
-        alpha = L.topLeftCorner(N, N).triangularView<Lower>().solve(Y);
-        L.topLeftCorner(N, N).triangularView<Eigen::Lower>().adjoint().solveInPlace(alpha);
+        alpha = L.triangularView<Lower>().solve(Y);
+        L.triangularView<Lower>().adjoint().solveInPlace(alpha);
         // alpha = Ky.llt().solve(Y);
 
         // 逆行列
-        K_inv = L * L.transpose();
-        K_inv = K_inv.inverse();
+        // K_inv = L * L.transpose();
+        // K_inv = K_inv.inverse();
+        K_inv = MatrixXd::Identity(N, N);
+        L.triangularView<Lower>().solveInPlace(K_inv);
+        L.triangularView<Lower>().adjoint().solveInPlace(K_inv);
 
         k_star.resize(N);
 
@@ -142,13 +149,13 @@ class GP
 
     inline VectorXd f()
     {
-        return (k_star.transpose() * K_inv * Y).transpose() + mean;
-        // return (alpha.transpose() * k_star) + mean;
+        // return (k_star.transpose() * K_inv * Y).transpose() + mean;
+        return (alpha.transpose() * k_star) + mean;
     }
 
     inline double sigma(const VectorXd &x)
     {
-        VectorXd v = L.topLeftCorner(N, N).triangularView<Eigen::Lower>().solve(k_star);
+        VectorXd v = L.triangularView<Lower>().solve(k_star);
         return rbf(x, x) - v.dot(v) + gaussian_variance;
     }
 
