@@ -15,7 +15,7 @@ class RBF:
 		
 	def set_params(self,new_params):
 		assert new_params.size == self.nparams
-		self.alpha,self.gamma = np.exp(new_params).copy().flatten()#try to unpack np array safely.  
+		self.alpha,self.gamma = new_params.copy().flatten()#try to unpack np array safely.  
 		
 	def get_params(self):
 		#return np.array([self.alpha, self.gamma])
@@ -28,7 +28,7 @@ class RBF:
 		#use broadcasting to avoid for loops. 
 		#should be uber fast
 		diff = x1.reshape(N1,1,D1)-x2.reshape(1,N2,D2)
-		diff = self.alpha*np.exp(-np.sum(np.square(diff),-1)*self.gamma)
+		diff = self.alpha*np.exp(-np.sum(np.square(diff),-1)*self.gamma*0.5)
 		return diff
 		
 	def gradients(self,x1):
@@ -37,9 +37,9 @@ class RBF:
 		diff = x1.reshape(N1,1,D1)-x1.reshape(1,N1,D1)
 		diff = np.sum(np.square(diff),-1)
 		#dalpha = np.exp(-diff*self.gamma)
-		dalpha = self.alpha*np.exp(-diff*self.gamma)
+		dalpha = self.alpha*np.exp(-diff*self.gamma * 0.5)
 		#dgamma = -self.alpha*diff*np.exp(-diff*self.gamma)
-		dgamma = -self.alpha*self.gamma*diff*np.exp(-diff*self.gamma)
+		dgamma = -self.alpha*self.gamma*diff*np.exp(-diff*self.gamma*0.5) * 0.5
 		return (dalpha, dgamma)
 		
 	def gradients_wrt_data(self,x1,indexn=None,indexd=None):

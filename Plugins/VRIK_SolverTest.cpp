@@ -107,10 +107,10 @@ int main()
     assert(check_gradient(gp, x, x_grad));
     // solver.minimize(gp, x, fx);
 
-    x.resize(3);
-    x << 0.1, 0.2, 0.3;
     gp.load("walk00_rmfinger_model.json");
-    gp.update_k_star(x);
+    x.resize(gp.dim);
+    x_grad.resize(gp.dim);
+    assert(check_gradient(gp, x, x_grad));
     // cout << gp.k_star << endl;
     // cout << gp.f() - gp.mean << endl;
     // cout << gp.K << endl;

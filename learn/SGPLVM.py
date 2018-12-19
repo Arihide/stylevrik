@@ -9,6 +9,61 @@ from bvh_reader import BVHReader
 
 from mathfunc import eulers_to_expmap
 
+
+def lik(x_star, y_star, sgplvm):
+
+    gp = sgplvm.GP
+
+    x_star = x_star.reshape(1, x_star.size)
+    y_star = y_star.reshape(1, y_star.size)
+
+    k_x_star_x = gp.kernel(x_star, gp.X)
+    k_x_star_x_star = gp.kernel(x_star, x_star)
+
+    means = np.dot(k_x_star_x, gp.A)
+    means += sgplvm.Ymean
+
+    v = np.linalg.solve(gp.L, k_x_star_x.T)
+    variance = k_x_star_x_star - np.dot(v.T, v) + 1./gp.beta
+
+    pyx = np.sum(((y_star - means) * sgplvm.W)**2) / variance
+
+    return (pyx + (gp.Ydim * np.log(variance)) + np.sum(x_star**2))[0, 0] / 2.
+
+
+def lik_grad(x_star, y_star, sgplvm):
+
+    gp = sgplvm.GP
+
+    x_star = x_star.reshape(1, x_star.size)
+    y_star = y_star.reshape(1, y_star.size)
+
+    k_x_star_x = gp.kernel(x_star, gp.X)
+    k_x_star_x_star = gp.kernel(x_star, x_star)
+
+    means = np.dot(k_x_star_x, gp.A)
+    means += sgplvm.Ymean
+
+    v = np.linalg.solve(gp.L, k_x_star_x.T)
+    variance = k_x_star_x_star - np.dot(v.T, v) + 1./gp.beta
+
+    y_grad = ((y_star - means) * sgplvm.W) / variance
+
+    pyx = np.sum(((y_star - means) * sgplvm.W)**2) / variance
+
+    dk_star_dx = np.zeros((gp.N, gp.Xdim))
+    for ix in range(gp.N):
+        dk_star_dx[ix] = (gp.X[ix] - x_star) * k_x_star_x[0, ix] * gp.kernel.gamma
+
+    gp.update_grad()
+
+    dfdx = np.dot(gp.A.T, dk_star_dx)
+    dsigmadx = -2. * np.dot(k_x_star_x, np.dot(gp.Kinv, dk_star_dx))
+
+    return (-np.dot(y_grad, dfdx) + dsigmadx * (gp.Ydim - pyx) / (2. * variance[0,0]) + x_star).flatten()
+    # return y_grad.flatten()
+
+
 class SGPLVM:
     """ TODO: this should inherrit a GP, not contain an instance of it..."""
 
@@ -31,11 +86,12 @@ class SGPLVM:
         for i in range(niters):
             self.GP.Y = (self.orgY - self.Ymean) * self.W
             self.optimise_GP_kernel()
-            self.optimise_latents()
+            self.optimise_latents2()
             # self.optimize_scale()
             # self.GP.Y = (self.orgY - self.Ymean)
             # self.GP.update()
-            self.W = np.sqrt(self.N / np.sum(self.orgY * np.dot(self.GP.Kinv, self.orgY), axis=0))
+            self.W = np.sqrt(self.N / np.sum(self.orgY *
+                                             np.dot(self.GP.Kinv, self.orgY), axis=0))
 
     def optimise_GP_kernel(self):
         """optimisation of the GP's kernel parameters"""
@@ -86,10 +142,19 @@ class SGPLVM:
             xtemp[i] = xopt
         self.GP.X = xtemp.copy()
 
+    def optimise_latents2(self):
+
+        xtemp = np.zeros(self.GP.X.shape)
+        for i, yy in enumerate(self.GP.Y):
+            original_x = self.GP.X[i].copy()
+            xopt = optimize.fmin_cg(lik, self.GP.X[i], fprime=lik_grad, disp=False, args=(yy, self))
+            self.GP.X[i] = original_x
+            xtemp[i] = xopt
+        self.GP.X = xtemp.copy()
 
 if __name__ == "__main__":
     # Y[10] = np.zeros(5)
-    Y = np.random.normal(0, 0.5, (30,5))
+    Y = np.random.normal(0, 0.5, (30, 5))
 
     br = BVHReader('bvh/walk00_rmfinger.bvh')
     br.read()
