@@ -112,7 +112,7 @@ int main()
     gp.load("walk00_rmfinger_model.json");
     gp.update_k_star(x);
     // cout << gp.k_star << endl;
-    cout << gp.f() - gp.mean << endl;
+    // cout << gp.f() - gp.mean << endl;
     // cout << gp.K << endl;
     // cout << gp.sigma(x) << endl;
 
