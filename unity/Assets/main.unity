@@ -569,10 +569,11 @@ MonoBehaviour:
   LeftHandTarget: {fileID: 1527730331}
   RightHandTarget: {fileID: 520366626}
   HeadTarget: {fileID: 2128534305}
-  SkeletonName: skeleton.json
-  GPModelName: testmodel.json
+  SkeletonName: skeleton_reduced.json
+  GPModelName: walk00_rmfinger_model.json
   Point: {fileID: 356233638}
   max_iterations: 5
+  IKWeight: 0.9
 --- !u!114 &1716061827
 MonoBehaviour:
   m_ObjectHideFlags: 0
