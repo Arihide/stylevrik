@@ -115,16 +115,15 @@ class GP
             }
         }
 
-        MatrixXd Ky = K;
-        Ky.diagonal() += (gaussian_variance + 1e-8) * VectorXd::Ones(N);
+        K.diagonal() += (gaussian_variance + 1e-8) * VectorXd::Ones(N);
 
         L.resize(N, N);
-        L = Ky.selfadjointView<Lower>().ldlt().matrixL();
+        L = K.selfadjointView<Lower>().ldlt().matrixL();
 
         alpha.resize(N, y_dim);
-        alpha = L.triangularView<Lower>().solve(Y);
+        alpha.noalias() = L.triangularView<Lower>().solve(Y);
         L.triangularView<Lower>().adjoint().solveInPlace(alpha);
-        // alpha = Ky.llt().solve(Y);
+        // alpha = K.llt().solve(Y);
 
         // 逆行列
         // K_inv = L * L.transpose();
@@ -164,7 +163,7 @@ class GP
         _dk_stardx.resize(N, x_dim);
         for (int ix = 0; ix < N; ix++)
         {
-            _dk_stardx.row(ix) = ((*inputs[ix]) - x) * k_star(ix) / (kernel_lengthscale * kernel_lengthscale);
+            _dk_stardx.row(ix).noalias() = ((*inputs[ix]) - x) * k_star(ix) / (kernel_lengthscale * kernel_lengthscale);
         }
         return _dk_stardx;
     }
@@ -200,8 +199,8 @@ class GP
         VectorXd _dsigmadx = -2. * k_star.transpose() * K_inv * _dk_stardx;
 
         // xの勾配
-        x_grad.tail(x_dim) = -_dfdx.transpose() * y_grad + _dsigmadx * (y_dim - pyx) / (2. * _sigma) + _x;
-        x_grad.head(y_dim) = y_grad;
+        x_grad.tail(x_dim).noalias() = -_dfdx.transpose() * y_grad + _dsigmadx * (y_dim - pyx) / (2. * _sigma) + _x;
+        x_grad.head(y_dim).noalias() = y_grad;
 
         // 尤度
         return (pyx + (y_dim * log(_sigma)) + _x.squaredNorm()) / 2.;
