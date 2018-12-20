@@ -9,7 +9,6 @@ from bvh_reader import BVHReader
 
 from mathfunc import eulers_to_expmap
 
-
 def lik(x_star, y_star, sgplvm):
 
     gp = sgplvm.GP
@@ -84,20 +83,20 @@ class SGPLVM:
 
     def learn(self, niters):
         for i in range(niters):
-            self.GP.Y = (self.orgY - self.Ymean) * self.W
+            # self.GP.Y = (self.orgY - self.Ymean) * self.W
             self.optimise_GP_kernel()
-            self.optimise_latents2()
+            # self.optimise_latents2()
             # self.optimize_scale()
             # self.GP.Y = (self.orgY - self.Ymean)
             # self.GP.update()
-            self.W = np.sqrt(self.N / np.sum(self.orgY *
-                                             np.dot(self.GP.Kinv, self.orgY), axis=0))
+            # self.W = np.sqrt(self.N / np.sum(self.orgY *
+            #                                  np.dot(self.GP.Kinv, self.orgY), axis=0))
 
     def optimise_GP_kernel(self):
         """optimisation of the GP's kernel parameters"""
         self.GP.update()
         self.GP.find_kernel_params()
-        print(self.GP.marginal(), 0.5*np.sum(np.square(self.GP.X)))
+        # print(self.GP.marginal(), 0.5*np.sum(np.square(self.GP.X)))
 
     def lls(self, s):
         self.GP.update()
@@ -154,13 +153,13 @@ class SGPLVM:
 
 if __name__ == "__main__":
     # Y[10] = np.zeros(5)
-    Y = np.random.normal(0, 0.5, (30, 5))
+    # Y = np.random.normal(0, 0.5, (30, 5))
 
     br = BVHReader('bvh/walk00_rmfinger.bvh')
     br.read()
-    # Y = np.asarray(br.motions)
-    # Y = np.asarray(eulers_to_expmap(Y))
-    # Y += np.random.normal(1, 0.05, Y.shape)
+    Y = np.asarray(br.motions)
+    Y = np.asarray(eulers_to_expmap(Y))
+    Y += np.random.normal(1, 0.05, Y.shape)
     # Y = Y[:, 3:]
     # Y = Y[::3]
 
@@ -169,7 +168,12 @@ if __name__ == "__main__":
     # print(optimize.check_grad(model.ll, model.ll_grad, np.random.rand(2), (1,)))
     # print(optimize.check_grad(model.lls, model.lls_grad, np.random.rand(model.GP.Ydim)))
 
-    model.learn(10)
+    print(model.GP.X)
+    print(model.GP.Y)
+
+    model.GP.find_kernel_params()
+
+    # model.learn(10)
 
     def save_model(model, output_filename):
         import json
@@ -190,6 +194,6 @@ if __name__ == "__main__":
         with open(output_filename + ".json", "w") as outfile:
             json.dump(output_dict, outfile, indent=2)
 
-    print(Y.std(0))
+    # print(Y.std(0))
 
     save_model(model, 'test')

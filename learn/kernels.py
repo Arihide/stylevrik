@@ -21,8 +21,8 @@ class RBF:
         self.alpha, self.gamma = new_params.copy().flatten()
 
     def get_params(self):
-        # return np.array([self.alpha, self.gamma])
-        return np.log(np.array([self.alpha, self.gamma]))
+        # return np.log(np.array([self.alpha, self.gamma]))
+        return np.array([self.alpha, self.gamma])
 
     def __call__(self, x1, x2):
         N1, D1 = x1.shape
@@ -40,9 +40,10 @@ class RBF:
         diff = x1.reshape(N1, 1, D1)-x1.reshape(1, N1, D1)
         diff = np.sum(np.square(diff), -1)
         #dalpha = np.exp(-diff*self.gamma)
-        dalpha = np.exp(-diff*self.gamma * 0.5)
+        dalpha = np.exp(diff*self.gamma * -0.5)
         #dgamma = -self.alpha*diff*np.exp(-diff*self.gamma)
         dgamma = -0.5 * diff * self.alpha*np.exp(-diff*self.gamma*0.5)
+        # return (dalpha, dgamma)
         return (dalpha, dgamma)
 
     def gradients_wrt_data(self, x1, indexn=None, indexd=None):

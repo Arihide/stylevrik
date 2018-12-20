@@ -53,7 +53,8 @@ def lgp_grad(beta):
     return [0.5 * np.trace(alphalphK) / beta[0]**2, -0.5 * np.sum(alphalphK * grads[0]), -0.5 * np.sum(alphalphK * grads[1])]
 
 
-# print(np.dot(kernel(1., X), np.linalg.inv(kernel(1., X))))
-# print(optimize.check_grad(model.GP.ll, model.GP.ll_grad, np.r_[1.], X, Y))
-# print(optimize.check_grad(kernel, kernel_grad, np.array([1.]), X))
 print(optimize.check_grad(lgp, lgp_grad, [10., 3., 3.]))
+
+# print(np.dot(kernel(1., X), np.linalg.inv(kernel(1., X))))
+print(optimize.check_grad(model.GP.ll, model.GP.ll_grad, np.r_[1., 1., 1.]))
+# print(optimize.check_grad(kernel, kernel_grad, np.array([1.]), X))
