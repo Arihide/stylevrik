@@ -11,6 +11,10 @@ import kernels
 from bvh_reader import BVHReader
 from mathfunc import eulers_to_expmap
 
+import matplotlib
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
 class GP:
     def __init__(self, X, Y, kernel=None, parameter_priors=None):
         """ a simple GP with optimisation of the Hyper parameters via the marginal likelihood approach.
@@ -145,7 +149,7 @@ if __name__ == '__main__':
     # generate data:
     Ndata = 50
     X = np.linspace(-3, 3, Ndata).reshape(Ndata, 1)
-    Y = np.hstack((np.sin(X) + np.random.normal(0, 10, X.shape)/20, np.random.normal(0, 1, X.shape), np.cos(X))) 
+    Y = np.hstack((np.sin(X) + np.random.normal(0, .1, X.shape)/20,)) 
     # Y = np.random.standard_normal(X.shape)
     Y_mean = Y.mean(0)
 
@@ -165,7 +169,14 @@ if __name__ == '__main__':
         pylab.plot(xx, yy + 2*np.sqrt(cc), 'k--', scaley=False)
         pylab.plot(xx, yy - 2*np.sqrt(cc), 'k--', scaley=False)
 
-    plot()
+    def plot_likelihood():
+        pylab.figure()
+        pylab.plot(X, Y, 'r.')
+        yy, cc = myGP.predict(xx)
+        yy += Y_mean
+        pylab.plot(xx, np.log(cc))
+
+    plot_likelihood()
 
     N, D = Y.shape
     W = np.ones(D)
@@ -190,13 +201,13 @@ if __name__ == '__main__':
     print(check_grad(lls, lls_grad, np.r_[2., 2., 1.], myGP))
 
     for _ in range(10):
-        myGP.Y = W * (Y - Y_mean)
+        # myGP.Y = W * (Y - Y_mean)
         myGP.find_kernel_params()
-        newW = fmin_l_bfgs_b(lls, W, fprime=lls_grad, args=(myGP,), bounds=[(0, None) for e in W])[0]
-        W = newW
+        # newW = fmin_l_bfgs_b(lls, W, fprime=lls_grad, args=(myGP,), bounds=[(0, None) for e in W])[0]
+        # W = newW
 
     print(W)
 
-    plot()
+    plot_likelihood()
 
     pylab.show()
