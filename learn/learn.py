@@ -109,6 +109,23 @@ def select_active_set(model, M=50):
         X, Y, model.kern, model.likelihood, inference_method=model.inference_method
     )
 
+def select_data_set(Y, threshold=4):
+
+    result = [Y[0]]
+
+    for y in Y:
+
+        is_valid = True
+
+        for r in result:
+            if np.linalg.norm(y-r) < threshold:
+                is_valid = False
+
+        if is_valid is True:
+            result.append(y)
+
+    return np.asarray(result)
+
 
 if __name__ == "__main__":
     args = sys.argv
@@ -119,6 +136,7 @@ if __name__ == "__main__":
     # データの下処理
     Y = np.asarray(br.motions)
     Y = np.asarray(mathfunc.eulers_to_expmap(Y))
+    # Y = select_data_set(Y, threshold=.1)
     # Y = motion_to_features(Y)
     # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
     # Y = np.hstack((Y, calculate_effector_velocity(39, br)))

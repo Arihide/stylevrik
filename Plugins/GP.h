@@ -183,11 +183,17 @@ class GP
         // 事後分布の平均
         VectorXd _f = f();
 
+        // 事後分布の分散（統計独立を仮定しているので対角行列）
+        // VectorXd v = L.triangularView<Lower>().solve(k_star);
+        // VectorXd _var = (rbf(x, x) - v.dot(v) + gaussian_variance) * st;
+
         // yの勾配
         VectorXd y_grad = (_y - _f).cwiseProduct(va) / _sigma;
+        // VectorXd y_grad = (_y - _f).cwiseQuotient(_var);
 
         // p(y|x)と相似な値
         double pyx = (_y - _f).cwiseProduct(st).squaredNorm() / _sigma;
+        // double pyx = (_y - _f).cwiseQuotient(_var).dot(_y - _f);
 
         // Shape: (N, dim_x)
         MatrixXd _dk_stardx = dk_stardx(_x);
