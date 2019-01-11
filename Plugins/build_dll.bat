@@ -4,7 +4,8 @@
 @rem http://gabekore.org/vscode-c-windows
 
 set "VSCMD_START_DIR=%CD%"
-call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\Tools\VsDevCmd.bat"
+if exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat" (call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat") ^
+else if exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat" (call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat")
 set compilerflags=/Ox /EHsc /c
 cl.exe %compilerflags% VRIK_SolverDll.cpp json11/json11.cpp iksolver/intern/IK_QJacobian.cpp iksolver/intern/IK_QSegment.cpp iksolver/intern/IK_QTask.cpp
 
