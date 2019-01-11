@@ -62,7 +62,7 @@ public class AnimationAvator : MonoBehaviour
 
         VRIKSolver.Solve(solver);
 
-        Point.position = new Vector3(VRIKSolver.GetLatentVariable(solver, 0), VRIKSolver.GetLatentVariable(solver, 1), 0);
+        Point.localPosition = new Vector3(VRIKSolver.GetLatentVariable(solver, 0), VRIKSolver.GetLatentVariable(solver, 1), 0);
 
         // legs
         SetRotation(animator, HumanBodyBones.RightUpperLeg, GetReceivedRotation(SkeletonBones.RightUpLeg));
@@ -85,7 +85,7 @@ public class AnimationAvator : MonoBehaviour
 
         // right hand
         // SetRotation(animator, HumanBodyBones.RightHand, GetReceivedRotation(SkeletonBones.RightHand));
-        animator.GetBoneTransform(HumanBodyBones.RightHand).localRotation = RightHandTarget.localRotation;
+        animator.GetBoneTransform(HumanBodyBones.RightHand).localRotation = RightHandTarget.rotation;
 
         // left arm
         SetRotation(animator, HumanBodyBones.LeftShoulder, GetReceivedRotation(SkeletonBones.LeftShoulder));
@@ -94,7 +94,7 @@ public class AnimationAvator : MonoBehaviour
 
         // left hand 手首の回転角はコントローラから直接入れる
         // SetRotation(animator, HumanBodyBones.LeftHand, GetReceivedRotation(SkeletonBones.LeftHand));
-        animator.GetBoneTransform(HumanBodyBones.LeftHand).localRotation = LeftHandTarget.localRotation;
+        animator.GetBoneTransform(HumanBodyBones.LeftHand).localRotation = LeftHandTarget.rotation;
 
     }
 
