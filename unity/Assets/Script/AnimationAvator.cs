@@ -28,7 +28,7 @@ public class AnimationAvator : MonoBehaviour
 
     [Range(1, 100)]public int max_iterations = 20;
 
-    [Range(0, 100)]public float IKWeight = 0.5f;
+    [Range(0, 10)]public float IKWeight = 0.5f;
 
     void Awake()
     {
@@ -84,53 +84,17 @@ public class AnimationAvator : MonoBehaviour
         SetRotation(animator, HumanBodyBones.RightLowerArm, GetReceivedRotation(SkeletonBones.RightForeArm));
 
         // right hand
-        SetRotation(animator, HumanBodyBones.RightHand, GetReceivedRotation(SkeletonBones.RightHand));
-        // SetRotation(animator, HumanBodyBones.RightThumbProximal, GetReceivedRotation(SkeletonBones.RightHandThumb1));
-        // SetRotation(animator, HumanBodyBones.RightThumbIntermediate, GetReceivedRotation(SkeletonBones.RightHandThumb2));
-        // SetRotation(animator, HumanBodyBones.RightThumbDistal, GetReceivedRotation(SkeletonBones.RightHandThumb3));
-
-        // SetRotation(animator, HumanBodyBones.RightIndexProximal, GetReceivedRotation(SkeletonBones.RightHandIndex1) * GetReceivedRotation(SkeletonBones.RightInHandIndex));
-        // SetRotation(animator, HumanBodyBones.RightIndexIntermediate, GetReceivedRotation(SkeletonBones.RightHandIndex2));
-        // SetRotation(animator, HumanBodyBones.RightIndexDistal, GetReceivedRotation(SkeletonBones.RightHandIndex3));
-
-        // SetRotation(animator, HumanBodyBones.RightMiddleProximal, GetReceivedRotation(SkeletonBones.RightHandMiddle1) * GetReceivedRotation(SkeletonBones.RightInHandMiddle));
-        // SetRotation(animator, HumanBodyBones.RightMiddleIntermediate, GetReceivedRotation(SkeletonBones.RightHandMiddle2));
-        // SetRotation(animator, HumanBodyBones.RightMiddleDistal, GetReceivedRotation(SkeletonBones.RightHandMiddle3));
-
-        // SetRotation(animator, HumanBodyBones.RightRingProximal, GetReceivedRotation(SkeletonBones.RightHandRing1) * GetReceivedRotation(SkeletonBones.RightInHandRing));
-        // SetRotation(animator, HumanBodyBones.RightRingIntermediate, GetReceivedRotation(SkeletonBones.RightHandRing2));
-        // SetRotation(animator, HumanBodyBones.RightRingDistal, GetReceivedRotation(SkeletonBones.RightHandRing3));
-
-        // SetRotation(animator, HumanBodyBones.RightLittleProximal, GetReceivedRotation(SkeletonBones.RightHandPinky1) * GetReceivedRotation(SkeletonBones.RightInHandPinky));
-        // SetRotation(animator, HumanBodyBones.RightLittleIntermediate, GetReceivedRotation(SkeletonBones.RightHandPinky2));
-        // SetRotation(animator, HumanBodyBones.RightLittleDistal, GetReceivedRotation(SkeletonBones.RightHandPinky3));
+        // SetRotation(animator, HumanBodyBones.RightHand, GetReceivedRotation(SkeletonBones.RightHand));
+        animator.GetBoneTransform(HumanBodyBones.RightHand).localRotation = RightHandTarget.localRotation;
 
         // left arm
         SetRotation(animator, HumanBodyBones.LeftShoulder, GetReceivedRotation(SkeletonBones.LeftShoulder));
         SetRotation(animator, HumanBodyBones.LeftUpperArm, GetReceivedRotation(SkeletonBones.LeftArm));
         SetRotation(animator, HumanBodyBones.LeftLowerArm, GetReceivedRotation(SkeletonBones.LeftForeArm));
 
-        // left hand
-        SetRotation(animator, HumanBodyBones.LeftHand, GetReceivedRotation(SkeletonBones.LeftHand));
-        // SetRotation(animator, HumanBodyBones.LeftThumbProximal, GetReceivedRotation(SkeletonBones.LeftHandThumb1));
-        // SetRotation(animator, HumanBodyBones.LeftThumbIntermediate, GetReceivedRotation(SkeletonBones.LeftHandThumb2));
-        // SetRotation(animator, HumanBodyBones.LeftThumbDistal, GetReceivedRotation(SkeletonBones.LeftHandThumb3));
-
-        // SetRotation(animator, HumanBodyBones.LeftIndexProximal, GetReceivedRotation(SkeletonBones.LeftHandIndex1) * GetReceivedRotation(SkeletonBones.LeftInHandIndex));
-        // SetRotation(animator, HumanBodyBones.LeftIndexIntermediate, GetReceivedRotation(SkeletonBones.LeftHandIndex2));
-        // SetRotation(animator, HumanBodyBones.LeftIndexDistal, GetReceivedRotation(SkeletonBones.LeftHandIndex3));
-
-        // SetRotation(animator, HumanBodyBones.LeftMiddleProximal, GetReceivedRotation(SkeletonBones.LeftHandMiddle1) * GetReceivedRotation(SkeletonBones.LeftInHandMiddle));
-        // SetRotation(animator, HumanBodyBones.LeftMiddleIntermediate, GetReceivedRotation(SkeletonBones.LeftHandMiddle2));
-        // SetRotation(animator, HumanBodyBones.LeftMiddleDistal, GetReceivedRotation(SkeletonBones.LeftHandMiddle3));
-
-        // SetRotation(animator, HumanBodyBones.LeftRingProximal, GetReceivedRotation(SkeletonBones.LeftHandRing1) * GetReceivedRotation(SkeletonBones.LeftInHandRing));
-        // SetRotation(animator, HumanBodyBones.LeftRingIntermediate, GetReceivedRotation(SkeletonBones.LeftHandRing2));
-        // SetRotation(animator, HumanBodyBones.LeftRingDistal, GetReceivedRotation(SkeletonBones.LeftHandRing3));
-
-        // SetRotation(animator, HumanBodyBones.LeftLittleProximal, GetReceivedRotation(SkeletonBones.LeftHandPinky1) * GetReceivedRotation(SkeletonBones.LeftInHandPinky));
-        // SetRotation(animator, HumanBodyBones.LeftLittleIntermediate, GetReceivedRotation(SkeletonBones.LeftHandPinky2));
-        // SetRotation(animator, HumanBodyBones.LeftLittleDistal, GetReceivedRotation(SkeletonBones.LeftHandPinky3));
+        // left hand 手首の回転角はコントローラから直接入れる
+        // SetRotation(animator, HumanBodyBones.LeftHand, GetReceivedRotation(SkeletonBones.LeftHand));
+        animator.GetBoneTransform(HumanBodyBones.LeftHand).localRotation = LeftHandTarget.localRotation;
 
     }
 
