@@ -47,7 +47,7 @@ class GP
     // RBFカーネルはこれで間違いないはず
     inline double rbf(const VectorXd &x1, const VectorXd &x2)
     {
-        return kernel_variance * exp(-0.5 * (x1 - x2).squaredNorm() / (kernel_lengthscale * kernel_lengthscale));
+        return kernel_variance * exp(-0.5 * (x1 - x2).squaredNorm() / (kernel_lengthscale));
     }
 
     // GPyで生成したパラメータの読み込み。
