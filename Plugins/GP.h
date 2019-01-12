@@ -105,32 +105,26 @@ class GP
         K.resize(N, N);
         for (int i = 0; i < N; i++)
         {
-            for (int j = 0; j < N; j++)
+            for (int j = 0; j <= i; j++)
             {
                 K(i, j) = rbf((*inputs[i]), (*inputs[j]));
             }
-            // for (int j = 0; j <= i; j++)
-            // {
-            //     K(i, j) = rbf((*inputs[i]), (*inputs[j]));
-            // }
         }
 
         K.diagonal() += (gaussian_variance + 1e-8) * VectorXd::Ones(N);
 
         L.resize(N, N);
-        L = K.selfadjointView<Lower>().ldlt().matrixL();
+        L = K.selfadjointView<Lower>().llt().matrixL();
 
         alpha.resize(N, y_dim);
         alpha.noalias() = L.triangularView<Lower>().solve(Y);
         L.triangularView<Lower>().adjoint().solveInPlace(alpha);
-        // alpha = K.llt().solve(Y);
 
         // 逆行列
-        K_inv = L * L.transpose();
-        K_inv = K_inv.inverse();
-        // K_inv = MatrixXd::Identity(N, N);
-        // L.triangularView<Lower>().solveInPlace(K_inv);
-        // L.triangularView<Lower>().adjoint().solveInPlace(K_inv);
+        // K_inv = (L * L.transpose()).inverse();
+        K_inv = MatrixXd::Identity(N, N);
+        L.triangularView<Lower>().solveInPlace(K_inv);
+        L.triangularView<Lower>().adjoint().solveInPlace(K_inv);
 
         k_star.resize(N);
 
