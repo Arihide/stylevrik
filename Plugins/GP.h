@@ -105,14 +105,14 @@ class GP
         K.resize(N, N);
         for (int i = 0; i < N; i++)
         {
-            // for (int j = 0; j < N; j++)
-            // {
-            //     K(i, j) = rbf((*inputs[i]), (*inputs[j]));
-            // }
-            for (int j = 0; j <= i; j++)
+            for (int j = 0; j < N; j++)
             {
                 K(i, j) = rbf((*inputs[i]), (*inputs[j]));
             }
+            // for (int j = 0; j <= i; j++)
+            // {
+            //     K(i, j) = rbf((*inputs[i]), (*inputs[j]));
+            // }
         }
 
         K.diagonal() += (gaussian_variance + 1e-8) * VectorXd::Ones(N);
@@ -126,11 +126,11 @@ class GP
         // alpha = K.llt().solve(Y);
 
         // 逆行列
-        // K_inv = L * L.transpose();
-        // K_inv = K_inv.inverse();
-        K_inv = MatrixXd::Identity(N, N);
-        L.triangularView<Lower>().solveInPlace(K_inv);
-        L.triangularView<Lower>().adjoint().solveInPlace(K_inv);
+        K_inv = L * L.transpose();
+        K_inv = K_inv.inverse();
+        // K_inv = MatrixXd::Identity(N, N);
+        // L.triangularView<Lower>().solveInPlace(K_inv);
+        // L.triangularView<Lower>().adjoint().solveInPlace(K_inv);
 
         k_star.resize(N);
 
@@ -163,7 +163,7 @@ class GP
         _dk_stardx.resize(N, x_dim);
         for (int ix = 0; ix < N; ix++)
         {
-            _dk_stardx.row(ix).noalias() = ((*inputs[ix]) - x) * k_star(ix) / (kernel_lengthscale);
+            _dk_stardx.row(ix) = ((*inputs[ix]) - x) * k_star(ix) / (kernel_lengthscale);
         }
         return _dk_stardx;
     }
