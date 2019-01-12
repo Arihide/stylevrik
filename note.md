@@ -1,3 +1,5 @@
+# Style-based VRIK
+
 より自然なVRアバターの制御をおこなう
 
 pythonによるモデルの学習
