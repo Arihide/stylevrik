@@ -163,7 +163,7 @@ class GP
         _dk_stardx.resize(N, x_dim);
         for (int ix = 0; ix < N; ix++)
         {
-            _dk_stardx.row(ix).noalias() = ((*inputs[ix]) - x) * k_star(ix) / (kernel_lengthscale * kernel_lengthscale);
+            _dk_stardx.row(ix).noalias() = ((*inputs[ix]) - x) * k_star(ix) / (kernel_lengthscale);
         }
         return _dk_stardx;
     }
