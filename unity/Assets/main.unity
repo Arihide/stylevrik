@@ -159,12 +159,12 @@ MeshRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 356233634}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 0
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
   m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
@@ -566,9 +566,9 @@ MonoBehaviour:
   RightHandTarget: {fileID: 180542776}
   HeadTarget: {fileID: 2128534305}
   SkeletonName: skeleton_reduced.json
-  GPModelName: Scene_5_rmfinger_reduced_model.json
+  GPModelName: Scene_5_rmfinger_reduced2_model_noised2.json
   Point: {fileID: 356233638}
-  max_iterations: 30
+  max_iterations: 100
   IKWeight: 0.27
 --- !u!114 &1716061827
 MonoBehaviour:
@@ -777,10 +777,10 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
   m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 2100000, guid: 0cc192ab7f73fcd45befe7c501426515, type: 2}

@@ -1,4 +1,4 @@
-name: base
+name: base2
 channels:
   - defaults
 dependencies:
@@ -268,5 +268,5 @@ dependencies:
     - plotly==2.7.0
     - pods==0.0.2a0
     - tables==3.4.2
-prefix: C:\Users\Takahashi\Anaconda3
+prefix: C:\ProgramData\Anaconda3\envs
 
