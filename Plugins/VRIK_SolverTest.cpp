@@ -65,8 +65,6 @@ bool check_gradient(Foo &f, VectorXd &x, VectorXd &x_grad)
 
         isGradOkay &= (abs(1.0 - global_ratio) < tolerance || global_diff);
 
-        // cout << isGradOkay << endl;
-
     }
 
     return isGradOkay;
@@ -85,36 +83,31 @@ int main()
     VectorXd x_grad = VectorXd::Zero(2);
 
     // "勾配のテスト"のテスト
-    // assert(check_gradient(func, x, x_grad));
+    assert(check_gradient(func, x, x_grad));
     solver.minimize(func, x, fx);
 
     assert(abs(x(0) - 10) < 1e-3);
     assert(abs(x(1) - 30) < 1e-3);
     assert(abs(fx) < 1e-3);
 
-    // GPパラメータの読み込み
     GP gp;
 
-    // 読み込んだパラメータのテスト
-    // GPの尤度の勾配のテスト
-
-    // 別のモデルでもテスト
+    // GPのモデル読み込み
     gp.load("testmodel_reduced.json");
+
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
 
     // 勾配の導関数が正しいか？
     assert(check_gradient(gp, x, x_grad));
-    // solver.minimize(gp, x, fx);
 
     gp.load("walk00_rmfinger_model.json");
     x.resize(gp.dim);
     x_grad.resize(gp.dim);
     assert(check_gradient(gp, x, x_grad));
-    // cout << gp.k_star << endl;
-    // cout << gp.f() - gp.mean << endl;
-    // cout << gp.K << endl;
-    // cout << gp.sigma(x) << endl;
+
+    // なぜか最小化できない
+    // solver.minimize(gp, x, fx);
 
     // IKのテスト
     // IK ik("skeleton.json");
@@ -131,9 +124,6 @@ int main()
     x_grad = VectorXd::Zero(gp.dim);
     assert(check_gradient(gpik, x, x_grad));
     solver.minimize(gpik, x, fx);
-
-    // gpik(x, x_grad);
-    // assert(check_gradient(gpik, x, x_grad));
 
     cout << "All tests were passed" << endl;
 
