@@ -2,7 +2,7 @@
 #include <cmath>
 #include "LBFGS.h"
 #include "GP.h"
-#include "GP_with_constraint.h"
+#include "GPIK.h"
 
 #include "iksolver/intern/IK_QJacobian.h"
 #include "iksolver/intern/IK_QTask.h"
@@ -17,7 +17,7 @@ public:
   double m_fx;
   
   GP gp;
-  GPConstraint gpconstraint;
+  GPIK gpik;
   
   LBFGSParam<double> param;
   LBFGSSolver<double> solver;

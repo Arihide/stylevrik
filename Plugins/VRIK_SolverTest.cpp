@@ -4,7 +4,7 @@
 #include <string>
 
 #include "GP.h"
-#include "GP_with_constraint.h"
+#include "GPIK.h"
 #include "ik_experiment.h"
 #include "LBFGS.h"
 #include "Eigen/Dense"
@@ -125,15 +125,15 @@ int main()
     // solver.minimize(ik, x, fx);
 
     // IK
-    GPConstraint gpcontraint;
-    gpcontraint.Initialize("skeleton_reduced.json", gp);
+    GPIK gpik;
+    gpik.Initialize("skeleton_reduced.json", gp);
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
-    assert(check_gradient(gpcontraint, x, x_grad));
-    solver.minimize(gpcontraint, x, fx);
+    assert(check_gradient(gpik, x, x_grad));
+    solver.minimize(gpik, x, fx);
 
-    // gpcontraint(x, x_grad);
-    // assert(check_gradient(gpconstraint, x, x_grad));
+    // gpik(x, x_grad);
+    // assert(check_gradient(gpik, x, x_grad));
 
     cout << "All tests were passed" << endl;
 
