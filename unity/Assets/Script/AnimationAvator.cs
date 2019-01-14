@@ -85,7 +85,7 @@ public class AnimationAvator : MonoBehaviour
 
         // right hand
         // SetRotation(animator, HumanBodyBones.RightHand, GetReceivedRotation(SkeletonBones.RightHand));
-        animator.GetBoneTransform(HumanBodyBones.RightHand).localRotation = RightHandTarget.rotation;
+        // animator.GetBoneTransform(HumanBodyBones.RightHand).localRotation = RightHandTarget.rotation;
 
         // left arm
         SetRotation(animator, HumanBodyBones.LeftShoulder, GetReceivedRotation(SkeletonBones.LeftShoulder));
@@ -94,7 +94,7 @@ public class AnimationAvator : MonoBehaviour
 
         // left hand 手首の回転角はコントローラから直接入れる
         // SetRotation(animator, HumanBodyBones.LeftHand, GetReceivedRotation(SkeletonBones.LeftHand));
-        animator.GetBoneTransform(HumanBodyBones.LeftHand).localRotation = LeftHandTarget.rotation;
+        // animator.GetBoneTransform(HumanBodyBones.LeftHand).localRotation = LeftHandTarget.rotation;
 
     }
 
