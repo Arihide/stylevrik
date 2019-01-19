@@ -5,7 +5,6 @@
 
 #include "GP.h"
 #include "GPIK.h"
-#include "ik_experiment.h"
 #include "LBFGS.h"
 #include "Eigen/Dense"
 
@@ -100,6 +99,7 @@ int main()
 
     // 勾配の導関数が正しいか？
     assert(check_gradient(gp, x, x_grad));
+    solver.minimize(gp, x, fx);
 
     gp.load("walk00_rmfinger_model.json");
     x.resize(gp.dim);
@@ -107,15 +107,6 @@ int main()
     assert(check_gradient(gp, x, x_grad));
 
     // なぜか最小化できない
-    // solver.minimize(gp, x, fx);
-
-    // IKのテスト
-    // IK ik("skeleton.json");
-    IK ik;
-    x.setZero(12);
-    x_grad.setZero(12);
-    assert(check_gradient(ik, x, x_grad));
-    // solver.minimize(ik, x, fx);
 
     // IK
     GPIK gpik;
