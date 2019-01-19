@@ -5,7 +5,7 @@
 
 #include "GP.h"
 #include "GPIK.h"
-#include "LBFGS.h"
+#include "LBFGS/LBFGS.h"
 #include "Eigen/Dense"
 
 using namespace std;

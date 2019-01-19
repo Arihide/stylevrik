@@ -1,6 +1,6 @@
 #include <vector>
 #include <cmath>
-#include "LBFGS.h"
+#include "LBFGS/LBFGS.h"
 #include "GP.h"
 #include "GPIK.h"
 

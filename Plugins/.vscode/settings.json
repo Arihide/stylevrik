@@ -51,7 +51,8 @@
         "xstddef": "cpp",
         "xtr1common": "cpp",
         "geometry": "cpp",
-        "dense": "cpp"
+        "dense": "cpp",
+        "core": "cpp"
     },
     "terminal.integrated.shell.windows": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
     "files.encoding": "utf8",

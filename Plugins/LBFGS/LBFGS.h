@@ -4,7 +4,7 @@
 #ifndef LBFGS_H
 #define LBFGS_H
 
-#include "Eigen/Core"
+#include "../Eigen/Core"
 #include "LBFGS/Param.h"
 #include "LBFGS/LineSearch.h"
 
