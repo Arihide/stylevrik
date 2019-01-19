@@ -4,26 +4,34 @@ from bvh_reader import BVHReader
 
 if __name__ == '__main__':
 
-    N = 130
+    N = 60
+    # N = 130
 
-    # extract_indices = [
-    #     957, 967, 1146, 2763
-    # ]
-    
+    # Scene_5_rmfinger_reduced.bvh 
     extract_indices = np.hstack((
         np.linspace(957, 2763, N).astype(np.int),
         np.linspace(3502, 4899, N).astype(np.int)
     ))
 
-    br = BVHReader('bvh/Scene_5_Char00_rmfinger.bvh')
-    br.read()
+    # shagamu_Char00.bvh
+    extract_indices = np.hstack((
+        np.linspace(543, 731, N).astype(np.int),
+        np.linspace(1176, 1334, N).astype(np.int),
+        np.linspace(2826, 3017, N).astype(np.int),
+        np.linspace(3717, 3900, N).astype(np.int)
+    ))
 
-    # if sys.argv[0] is not None:
-    #     sys.exit()
+    try:
+        sys.argv[1]
+    except:
+        sys.exit()
+
+    br = BVHReader(sys.argv[1])
+    br.read()
 
     Y = np.asarray(br.motions)
 
-    with open('bvh/Scene_5_rmfinger_reduced2.bvh', 'w') as ftarget:
+    with open('%s_reduced.bvh' % sys.argv[1][:-4], 'w') as ftarget:
 
         ftarget.write('Frames: %d\n' % extract_indices.size)
         ftarget.write('Frame Time: %f\n' % 0.01)
