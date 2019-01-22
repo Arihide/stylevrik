@@ -4,8 +4,8 @@
 #include "GP.h"
 #include "GPIK.h"
 
-#include "iksolver/intern/IK_QJacobian.h"
-#include "iksolver/intern/IK_QTask.h"
+// #include "iksolver/IK_QJacobian.h"
+// #include "iksolver/IK_QTask.h"
 
 using namespace Eigen;
 using namespace LBFGSpp;

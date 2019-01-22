@@ -1,7 +1,7 @@
-#include "iksolver/intern/IK_Math.h"
-#include "iksolver/intern/IK_QJacobian.h"
-#include "iksolver/intern/IK_QTask.h"
-#include "iksolver/intern/IK_QSegment.h"
+#include "iksolver/IK_Math.h"
+#include "iksolver/IK_QJacobian.h"
+#include "iksolver/IK_QTask.h"
+#include "iksolver/IK_QSegment.h"
 
 #include "Eigen/Dense"
 #include "json11/json11.hpp"

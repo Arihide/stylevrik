@@ -8,4 +8,4 @@ if exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7
 else if exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" (call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat")
 set compilerflags=/Zi /EHsc /DEBUG
 set linkerflags=/OUT:VRIK_SolverTest.exe
-cl.exe %compilerflags% VRIK_SolverTest.cpp json11/json11.cpp iksolver/intern/IK_QJacobian.cpp iksolver/intern/IK_QSegment.cpp iksolver/intern/IK_QTask.cpp /link %linkerflags%
+cl.exe %compilerflags% VRIK_SolverTest.cpp json11/json11.cpp iksolver/IK_QJacobian.cpp iksolver/IK_QSegment.cpp iksolver/IK_QTask.cpp /link %linkerflags%

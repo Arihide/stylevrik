@@ -7,7 +7,7 @@ set "VSCMD_START_DIR=%CD%"
 if exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat" (call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat") ^
 else if exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat" (call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat")
 set compilerflags=/Ox /EHsc /c
-cl.exe %compilerflags% VRIK_SolverDll.cpp json11/json11.cpp iksolver/intern/IK_QJacobian.cpp iksolver/intern/IK_QSegment.cpp iksolver/intern/IK_QTask.cpp
+cl.exe %compilerflags% VRIK_SolverDll.cpp json11/json11.cpp iksolver/IK_QJacobian.cpp iksolver/IK_QSegment.cpp iksolver/IK_QTask.cpp
 
 set compilerflags=/DLL
 set linkerflags=/OUT:VRIKSolver.dll
