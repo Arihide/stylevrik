@@ -10,9 +10,9 @@
             "args": [
                 "-c",
                 "./json11/json11.cpp",
-                "./iksolver/intern/IK_QJacobian.cpp",
-                "./iksolver/intern/IK_QSegment.cpp",
-                "./iksolver/intern/IK_QTask.cpp"
+                "./iksolver/IK_QJacobian.cpp",
+                "./iksolver/IK_QSegment.cpp",
+                "./iksolver/IK_QTask.cpp"
             ],
             "group": {
                 "kind": "build",
@@ -49,6 +49,18 @@
             ]
         },
         {
+            "label": "clvrikbuild",
+            "type": "shell",
+            "command": "${workspaceFolder}/build_dll.bat",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        {
             "label": "builddll",
             "type": "shell",
             "command": "C:/'Program Files (x86)'/'Microsoft Visual Studio'/2017/BuildTools/VC/Tools/MSVC/14.15.26726/bin/Hostx64/x64/cl.exe",
@@ -70,9 +82,9 @@
                 "/IC:/Program Files (x86)/Windows Kits/10/include/10.0.17134.0/cppwinrt",
                 "VRIK_SolverDll.cpp",
                 "json11/json11.cpp",
-                "iksolver/intern/IK_QJacobian.cpp",
-                "iksolver/intern/IK_QSegment.cpp",
-                "iksolver/intern/IK_QTask.cpp"
+                "iksolver/IK_QJacobian.cpp",
+                "iksolver/IK_QSegment.cpp",
+                "iksolver/IK_QTask.cpp"
             ],
             "group": {
                 "kind": "build",
