@@ -1,7 +1,0 @@
-# Style-based VRIK
-
-より自然なVRアバターの制御をおこなう
-
-pythonによるモデルの学習
-
-Unity 2018.2.14f1

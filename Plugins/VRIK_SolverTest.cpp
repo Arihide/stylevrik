@@ -92,7 +92,7 @@ int main()
     GP gp;
 
     // GPのモデル読み込み
-    gp.load("testmodel_reduced.json");
+    gp.load("testmodels/testmodel_reduced.json");
 
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
@@ -101,7 +101,7 @@ int main()
     assert(check_gradient(gp, x, x_grad));
     solver.minimize(gp, x, fx);
 
-    gp.load("walk00_rmfinger_model.json");
+    gp.load("testmodels/walk00_rmfinger_model.json");
     x.resize(gp.dim);
     x_grad.resize(gp.dim);
     assert(check_gradient(gp, x, x_grad));
@@ -110,7 +110,7 @@ int main()
 
     // IK
     GPIK gpik;
-    gpik.Initialize("skeleton_reduced.json", gp);
+    gpik.Initialize("testmodels/skeleton_reduced.json", gp);
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
     assert(check_gradient(gpik, x, x_grad));
