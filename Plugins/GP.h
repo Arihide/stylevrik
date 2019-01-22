@@ -120,11 +120,12 @@ class GP
         alpha.noalias() = L.triangularView<Lower>().solve(Y);
         L.triangularView<Lower>().adjoint().solveInPlace(alpha);
 
-        // 逆行列
+        // 逆行列 K^{-1} = (L * L^T)^{-1} = (L^{-1})^T * L^{-1}
         // K_inv = (L * L.transpose()).inverse();
         K_inv = MatrixXd::Identity(N, N);
         L.triangularView<Lower>().solveInPlace(K_inv);
-        L.triangularView<Lower>().adjoint().solveInPlace(K_inv);
+        K_inv = K_inv.transpose() * K_inv;
+        // L.triangularView<Lower>().adjoint().solveInPlace(K_inv);
 
         k_star.resize(N);
 
