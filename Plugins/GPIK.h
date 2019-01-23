@@ -54,7 +54,6 @@ class GPIK
   public:
     std::list<IK_QSolver *> solvers;
 
-    // std::list<IK_QTask *> tasks;
     IK_QJacobian m_rjacobian;
     IK_QJacobian m_ljacobian;
     IK_QSegment *rroot;
@@ -63,10 +62,6 @@ class GPIK
     IK_QSegment *ltip;
 
     IK_QSegment *seg;
-    IK_QSegment *segs3;
-    IK_QSegment *segs2;
-    IK_QSegment *segs1;
-    IK_QSegment *segs;
 
     IK_QSegment *seg2;
 
@@ -102,19 +97,9 @@ class GPIK
 
         m_rootmatrix.setIdentity();
 
-        // segs = CreateSegment(Spine);
-        // segs1 = CreateSegment(Spine1);
-        // segs2 = CreateSegment(Spine2);
-        // segs3 = CreateSegment(Spine3);
-
         rroot = CreateSegment(RightShoulder);
         seg = CreateSegment(RightArm);      // RightArm
         rtip = CreateSegment(RightForeArm); // RightForeArm
-
-        // SetSegmentTransform(segs, Spine1);
-        // SetSegmentTransform(segs1, Spine2);
-        // SetSegmentTransform(segs2, Spine3);
-        // SetSegmentTransform(segs3, Neck);
 
         SetSegmentTransform(rroot, RightArm);
         SetSegmentTransform(seg, RightForeArm);
@@ -122,10 +107,6 @@ class GPIK
         segment_map[RightShoulder] = rroot;
         segment_map[RightArm] = seg;
         segment_map[RightForeArm] = rtip;
-
-        // segs3->SetParent(segs2);
-        // segs2->SetParent(segs1);
-        // segs1->SetParent(segs);
 
         rtip->SetParent(seg);
         seg->SetParent(rroot);
@@ -138,7 +119,7 @@ class GPIK
 
         Vector3d goal(1, 10, 1);
         Vector3d vgoal(0, 0, 0);
-        // IK_QTask *ee = new IK_QPositionTask(true, rtip, goal);
+
         rptask = new IK_QPositionTask(true, rtip, goal);
         rvtask = new IK_QVelocityTask(true, rtip, vgoal);
 
@@ -192,17 +173,6 @@ class GPIK
 
         solvers.push_back(rsolver);
         solvers.push_back(lsolver);
-
-        // tasks.push_back(lptask);
-        // tasks.push_back(rptask);
-
-        // int primary_size = 0;
-        // for (rptask = tasks.begin(); rptask != tasks.end(); rptask++)
-        // {
-        //     IK_QTask *qtask = *rptask;
-        //     qtask->SetId(primary_size);
-        //     primary_size += qtask->Size();
-        // }
 
         m_rjacobian.ArmMatrices(rmatrows, 3);
         m_ljacobian.ArmMatrices(lmatrows, 3);
@@ -332,23 +302,6 @@ class GPIK
             obj += jac->m_beta.head(3).squaredNorm() * 0.5 * lambda;
 
         }
-
-        // rroot->UpdateTransform(m_rootmatrix);
-        // lroot->UpdateTransform(m_rootmatrix);
-
-        // rptask->ComputeExpMapJacobian(m_rjacobian, x.segment(RightShoulder * 3, rmatrows));
-        // lptask->ComputeExpMapJacobian(m_ljacobian, x.segment(LeftShoulder * 3, lmatrows));
-
-        // x_grad = VectorXd::Zero(m_gp.dim);
-
-        // // 目的関数とその勾配
-        // obj = m_gp(x, x_grad);
-
-        // x_grad.segment(RightShoulder * 3, rmatrows) += -m_rjacobian.m_jacobian.transpose() * m_rjacobian.m_beta * lambda;
-        // x_grad.segment(LeftShoulder * 3, lmatrows) += -m_ljacobian.m_jacobian.transpose() * m_ljacobian.m_beta * lambda;
-
-        // obj += m_rjacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
-        // obj += m_ljacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
 
         return obj;
     }
