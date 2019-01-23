@@ -32,7 +32,7 @@ public static class VRIKSolver
     public static extern float GetAngle(IntPtr solver, int boneIndex, int eulerIndex);
     
     [DllImport("VRIKSolver")]
-    public static extern float GetExampleAngle(IntPtr solver, int boneIndex, int eulerIndex);
+    public static extern float GetExampleAngle(IntPtr solver, int boneIndex, int eulerIndex, int frame);
 
     [DllImport("VRIKSolver")]
     public static extern float GetLatentVariable(IntPtr solver, int index);
