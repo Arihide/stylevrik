@@ -15,6 +15,21 @@
 
 using namespace std;
 
+class IK_QSolver
+{
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    IK_QSolver() : root(NULL)
+    {
+    }
+
+    // IK_QJacobianSolver solver;
+    int rootID;
+    IK_QSegment *root;
+    IK_QJacobian *jacobian;
+    std::list<IK_QPositionTask *> tasks;
+};
+
 class GPIK
 {
     // skeleton.jsonからRightArmを求めたほうが良いはず
@@ -37,7 +52,9 @@ class GPIK
     int lmatrows = 9;
 
   public:
-    std::list<IK_QTask *> tasks;
+    std::list<IK_QSolver *> solvers;
+
+    // std::list<IK_QTask *> tasks;
     IK_QJacobian m_rjacobian;
     IK_QJacobian m_ljacobian;
     IK_QSegment *rroot;
@@ -85,20 +102,20 @@ class GPIK
 
         m_rootmatrix.setIdentity();
 
-        segs = CreateSegment(Spine);
-        segs1 = CreateSegment(Spine1);
-        segs2 = CreateSegment(Spine2);
-        segs3 = CreateSegment(Spine3);
+        // segs = CreateSegment(Spine);
+        // segs1 = CreateSegment(Spine1);
+        // segs2 = CreateSegment(Spine2);
+        // segs3 = CreateSegment(Spine3);
 
         rroot = CreateSegment(RightShoulder);
         seg = CreateSegment(RightArm);      // RightArm
         rtip = CreateSegment(RightForeArm); // RightForeArm
 
-        SetSegmentTransform(segs, Spine1);
-        SetSegmentTransform(segs1, Spine2);
-        SetSegmentTransform(segs2, Spine3);
-        SetSegmentTransform(segs3, Neck);
-        
+        // SetSegmentTransform(segs, Spine1);
+        // SetSegmentTransform(segs1, Spine2);
+        // SetSegmentTransform(segs2, Spine3);
+        // SetSegmentTransform(segs3, Neck);
+
         SetSegmentTransform(rroot, RightArm);
         SetSegmentTransform(seg, RightForeArm);
         SetSegmentTransform(rtip, RightHand);
@@ -106,9 +123,9 @@ class GPIK
         segment_map[RightArm] = seg;
         segment_map[RightForeArm] = rtip;
 
-        segs3->SetParent(segs2);
-        segs2->SetParent(segs1);
-        segs1->SetParent(segs);
+        // segs3->SetParent(segs2);
+        // segs2->SetParent(segs1);
+        // segs1->SetParent(segs);
 
         rtip->SetParent(seg);
         seg->SetParent(rroot);
@@ -116,7 +133,7 @@ class GPIK
         rroot->SetDoFId(0);
         seg->SetDoFId(3);
         rtip->SetDoFId(6);
-        
+
         rroot->UpdateTransform(m_rootmatrix);
 
         Vector3d goal(1, 10, 1);
@@ -161,7 +178,23 @@ class GPIK
 
         lroot->UpdateTransform(m_rootmatrix);
 
-        // tasks.push_back(ee);
+        IK_QSolver *rsolver = new IK_QSolver();
+        rsolver->rootID = RightShoulder;
+        rsolver->root = rroot;
+        rsolver->jacobian = &m_rjacobian;
+        rsolver->tasks.push_back(rptask);
+
+        IK_QSolver *lsolver = new IK_QSolver();
+        lsolver->rootID = LeftShoulder;
+        lsolver->root = lroot;
+        lsolver->jacobian = &m_ljacobian;
+        lsolver->tasks.push_back(lptask);
+
+        solvers.push_back(rsolver);
+        solvers.push_back(lsolver);
+
+        // tasks.push_back(lptask);
+        // tasks.push_back(rptask);
 
         // int primary_size = 0;
         // for (rptask = tasks.begin(); rptask != tasks.end(); rptask++)
@@ -273,28 +306,49 @@ class GPIK
             UpdateSegment(i->second, x(i->first * 3 + 0), x(i->first * 3 + 1), x(i->first * 3 + 2));
         }
 
-        rroot->UpdateTransform(m_rootmatrix);
-        lroot->UpdateTransform(m_rootmatrix);
-
-        // std::list<IK_QTask *>::iterator task;
-        // for (task = tasks.begin(); task != tasks.end(); task++)
-        // {
-        //     (*task)->ComputeJacobian(m_rjacobian);
-        // }
-
-        rptask->ComputeExpMapJacobian(m_rjacobian, x.segment(RightShoulder * 3, rmatrows));
-        lptask->ComputeExpMapJacobian(m_ljacobian, x.segment(LeftShoulder * 3, lmatrows));
-
         x_grad = VectorXd::Zero(m_gp.dim);
 
-        // 目的関数とその勾配
         obj = m_gp(x, x_grad);
 
-        x_grad.segment(RightShoulder * 3, rmatrows) += -m_rjacobian.m_jacobian.transpose() * m_rjacobian.m_beta * lambda;
-        x_grad.segment(LeftShoulder * 3, lmatrows) += -m_ljacobian.m_jacobian.transpose() * m_ljacobian.m_beta * lambda;
+        std::list<IK_QSolver *>::iterator solver;
+        for (solver = solvers.begin(); solver != solvers.end(); solver++)
+        {
 
-        obj += m_rjacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
-        obj += m_ljacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
+            const int matrow = 9;
+
+            std::list<IK_QPositionTask *>::iterator task;
+            IK_QJacobian *jac = (*solver)->jacobian;
+
+
+            (*solver)->root->UpdateTransform(m_rootmatrix);
+
+            for (task = (*solver)->tasks.begin(); task != (*solver)->tasks.end(); task++)
+            {
+                (*task)->ComputeExpMapJacobian(*jac, x.segment((*solver)->rootID * 3, matrow));
+            }
+
+            x_grad.segment((*solver)->rootID * 3, matrow) += -jac->m_jacobian.transpose() * jac->m_beta * lambda;
+
+            obj += jac->m_beta.head(3).squaredNorm() * 0.5 * lambda;
+
+        }
+
+        // rroot->UpdateTransform(m_rootmatrix);
+        // lroot->UpdateTransform(m_rootmatrix);
+
+        // rptask->ComputeExpMapJacobian(m_rjacobian, x.segment(RightShoulder * 3, rmatrows));
+        // lptask->ComputeExpMapJacobian(m_ljacobian, x.segment(LeftShoulder * 3, lmatrows));
+
+        // x_grad = VectorXd::Zero(m_gp.dim);
+
+        // // 目的関数とその勾配
+        // obj = m_gp(x, x_grad);
+
+        // x_grad.segment(RightShoulder * 3, rmatrows) += -m_rjacobian.m_jacobian.transpose() * m_rjacobian.m_beta * lambda;
+        // x_grad.segment(LeftShoulder * 3, lmatrows) += -m_ljacobian.m_jacobian.transpose() * m_ljacobian.m_beta * lambda;
+
+        // obj += m_rjacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
+        // obj += m_ljacobian.m_beta.head(3).squaredNorm() * 0.5 * lambda;
 
         return obj;
     }

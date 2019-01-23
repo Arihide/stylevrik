@@ -12,3 +12,4 @@
 pipや本家のblender-mathutilsからではうまくいかなかった。
 https://gitlab.com/m1lhaus/blender-mathutils からダウンロードする。
 
+```conda activate stylevrik_env```

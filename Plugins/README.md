@@ -18,8 +18,8 @@ g++ -Wall -I Eigen -fPIC -shared -O2 -o ../AI4Animation/Assets/Plugins/libEigen.
 3. ```All tests were passed```と出力されればOK
 
 ## DLLのビルド
-```build_dll.bat```を実行する
-```VRIKSolver.dll```が作られる
+1. ```build_dll.bat```を実行する
+2. ```VRIKSolver.dll```が作られる
 
 A compact formula for the derivative of a 3-D rotation in exponential coordinates  
 Practical Parameterization of Rotations Using the Exponential Map
