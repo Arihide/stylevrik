@@ -23,7 +23,6 @@ class IK_QSolver
     {
     }
 
-    // IK_QJacobianSolver solver;
     int rootID;
     IK_QSegment *root;
     IK_QJacobian *jacobian;
