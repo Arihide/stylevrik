@@ -2,6 +2,11 @@ import math
 import mathutils
 import numpy as np
 
+# 初期姿勢は向かい合っている
+# x右　y上　z手前
+
+# Unity　x右　y上　z奥
+# ZXY!!
 
 def eulers_to_expmap(eulerArray):
 
@@ -12,10 +17,21 @@ def eulers_to_expmap(eulerArray):
         tmp = []
         # tmp = [e[0], e[1], e[2]]
         for i in range(3, len(e), 3):
-            expmap = mathutils.Euler(
+            quat = mathutils.Euler(
                 (math.radians(e[i+1]),
                  -math.radians(e[i]),
-                 -math.radians(e[i+2])), 'YXZ').to_quaternion().to_exponential_map()
+                 -math.radians(e[i+2])), 'ZXY').to_quaternion()
+
+            # yrot = mathutils.Euler((0, math.pi, 0)).to_quaternion()
+            # zrot = mathutils.Euler((0, 0, math.pi)).to_quaternion()
+            # quat = yrot * zrot * quat
+
+            axis, angle = quat.to_axis_angle()
+
+            expmap = axis * angle
+
+            # expmap = quat.to_exponential_map()
+
             tmp.append(expmap.x)
             tmp.append(expmap.y)
             tmp.append(expmap.z)
@@ -30,15 +46,12 @@ def expmap_to_euler(expmapArray):
     result = []
 
     for e in expmapArray:
-        tmp = [e[0], e[1], e[2]]
         for i in range(3, len(e), 3):
-            euler = mathutils.Quaternion(
-                (e[i], e[i+1], e[i+2])).to_euler('YXZ')
-            tmp.append(math.degrees(euler.y))
-            tmp.append(math.degrees(euler.x))
-            tmp.append(math.degrees(euler.z))
-
-        result.append(tmp)
+            euler = mathutils.Vector((e[i], e[i+1], e[i+2]))
+            euler = euler / euler.length
+            result.append(math.degrees(euler.y))
+            result.append(math.degrees(euler.x))
+            result.append(math.degrees(euler.z))
 
     return result
 

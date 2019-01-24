@@ -156,6 +156,8 @@ if __name__ == "__main__":
     model = ScaledGPLVM(Y-Y_mean, latent_dim, kernel=kernel)
     # model = GPy.models.GPLVM(Y_normalized, latent_dim, kernel=kernel)
     # model = GPy.models.BCGPLVM(Y_normalized, latent_dim, kernel=kernel)
+
+    #optimize
     model.optimize(messages=1, max_iters=5e20)
 
     # print(model._raw_predict(np.array([[0.1, 0.2, 0.3]])))
