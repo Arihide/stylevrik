@@ -6,6 +6,10 @@ public static class VRIKSolver
 
     [DllImport("VRIKSolver")]
     public static extern IntPtr Create(string skeleton, string gpmodel);
+    [DllImport("VRIKSolver")]
+    public static extern void CreateRightHandSolver(IntPtr solver);
+    [DllImport("VRIKSolver")]
+    public static extern void CreateLeftHandSolver(IntPtr solver);
 
     [DllImport("VRIKSolver")]
     public static extern void SetMaxIterations(IntPtr solver, int max_iterations);

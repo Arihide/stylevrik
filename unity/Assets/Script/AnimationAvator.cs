@@ -26,9 +26,11 @@ public class AnimationAvator : MonoBehaviour
 
     public Transform Point;
 
+    public int[] ikchain;
     [Range(1, 100)]public int max_iterations = 20;
 
     [Range(0, 10)]public float IKWeight = 0.5f;
+
 
     void Awake()
     {
@@ -45,6 +47,8 @@ public class AnimationAvator : MonoBehaviour
         animator = GetComponent<Animator>();
 
         solver = VRIKSolver.Create(SkeletonPath, GPModelPath);
+        VRIKSolver.CreateLeftHandSolver(solver);
+        VRIKSolver.CreateRightHandSolver(solver);
 
         VRIKSolver.SetLambda(solver, IKWeight);
 
@@ -121,6 +125,13 @@ public class AnimationAvator : MonoBehaviour
             VRIKSolver.GetAngle(solver, (int)neuronBones + 0, 1),
             VRIKSolver.GetAngle(solver, (int)neuronBones + 0, 2)
         );
+
+        // int frame = 50;
+        // Vector3 axis = new Vector3(
+        //     VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 0, frame),
+        //     VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 1, frame),
+        //     VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 2, frame)
+        // );
 
         float angle = axis.magnitude;
 

@@ -96,8 +96,8 @@ class GPIK
 
         m_rootmatrix.setIdentity();
 
-        CreateRightSolver();
-        CreateLeftSolver();
+        // CreateRightSolver();
+        // CreateLeftSolver();
 
     }
 
