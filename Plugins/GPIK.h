@@ -96,6 +96,13 @@ class GPIK
 
         m_rootmatrix.setIdentity();
 
+        CreateRightSolver();
+        CreateLeftSolver();
+
+    }
+
+    void CreateRightSolver(){
+
         rroot = CreateSegment(RightShoulder);
         seg = CreateSegment(RightArm);      // RightArm
         rtip = CreateSegment(RightForeArm); // RightForeArm
@@ -103,6 +110,7 @@ class GPIK
         SetSegmentTransform(rroot, RightArm);
         SetSegmentTransform(seg, RightForeArm);
         SetSegmentTransform(rtip, RightHand);
+        
         segment_map[RightShoulder] = rroot;
         segment_map[RightArm] = seg;
         segment_map[RightForeArm] = rtip;
@@ -125,14 +133,19 @@ class GPIK
         rptask->SetId(0);
         rvtask->SetId(3);
 
-        // 指先の関節を含めたとき
-        // lroot = CreateSegment(37); //LeftArm
-        // ltip = CreateSegment(38);  //LeftForeArm
-        // SetSegmentTransform(lroot, 38);
-        // SetSegmentTransform(ltip, 39);
-        // segment_map[37] = lroot;
-        // segment_map[38] = ltip;
+        IK_QSolver *rsolver = new IK_QSolver();
+        rsolver->rootID = RightShoulder;
+        rsolver->root = rroot;
+        rsolver->jacobian = &m_rjacobian;
+        rsolver->tasks.push_back(rptask);
 
+        solvers.push_back(rsolver);
+
+        m_rjacobian.ArmMatrices(rmatrows, 3);
+
+    }
+
+    void CreateLeftSolver(){
         lroot = CreateSegment(LeftShoulder);
         seg2 = CreateSegment(LeftArm);
         ltip = CreateSegment(LeftForeArm);
@@ -150,6 +163,9 @@ class GPIK
         seg2->SetDoFId(3);
         ltip->SetDoFId(6);
 
+        Vector3d goal(1, 10, 1);
+        Vector3d vgoal(0, 0, 0);
+        
         lptask = new IK_QPositionTask(true, ltip, goal);
         lvtask = new IK_QVelocityTask(true, ltip, goal);
 
@@ -158,11 +174,6 @@ class GPIK
 
         lroot->UpdateTransform(m_rootmatrix);
 
-        IK_QSolver *rsolver = new IK_QSolver();
-        rsolver->rootID = RightShoulder;
-        rsolver->root = rroot;
-        rsolver->jacobian = &m_rjacobian;
-        rsolver->tasks.push_back(rptask);
 
         IK_QSolver *lsolver = new IK_QSolver();
         lsolver->rootID = LeftShoulder;
@@ -170,11 +181,10 @@ class GPIK
         lsolver->jacobian = &m_ljacobian;
         lsolver->tasks.push_back(lptask);
 
-        solvers.push_back(rsolver);
         solvers.push_back(lsolver);
 
-        m_rjacobian.ArmMatrices(rmatrows, 3);
         m_ljacobian.ArmMatrices(lmatrows, 3);
+
     }
 
     IK_QSphericalSegment *CreateSegment(int id)
