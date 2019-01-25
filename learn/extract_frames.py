@@ -4,7 +4,7 @@ from bvh_reader import BVHReader
 
 if __name__ == '__main__':
 
-    N = 70
+    N = 60
     # N = 130
 
     # Scene_5_rmfinger_reduced.bvh 

@@ -146,15 +146,15 @@ if __name__ == "__main__":
     kernel = GPy.kern.RBF(input_dim=latent_dim, lengthscale=None, ARD=False)
 
     Y_mean = Y.mean(0)
-
+    Y_std = Y.std(0)
     # Y = Y[::3]
     # Y_std = np.ones(Y_std.shape)
 
     # これおかしい？
-    # Y_normalized = np.divide(Y-Y_mean, Y_std)
+    Y_normalized = np.divide(Y-Y_mean, Y_std, where=Y_std!=0)
 
-    model = ScaledGPLVM(Y-Y_mean, latent_dim, kernel=kernel)
-    # model = GPy.models.GPLVM(Y_normalized, latent_dim, kernel=kernel)
+    # model = ScaledGPLVM(Y-Y_mean, latent_dim, kernel=kernel)
+    model = GPy.models.GPLVM(Y_normalized, latent_dim, kernel=kernel)
     # model = GPy.models.BCGPLVM(Y_normalized, latent_dim, kernel=kernel)
 
     #optimize
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     # smooth model
     model.Y = add_gaussian_noise(model.Y, noise_variance=0.0001)
     model.unlink_parameter(model.X)
-    model.unlink_parameter(model.S)
+    # model.unlink_parameter(model.S)
     model.optimize(messages=1, max_iters=5e20)
 
     # model = select_active_set(model)
@@ -183,7 +183,8 @@ if __name__ == "__main__":
     #     model.Y_normalized.shape[0]), figure=figure, legend=False)
 
     # GPy.plotting.show(canvas, filename='wishart_metric_notebook')
-    Y_std = model.S
+    # Y_std = model.S
+    Y_std = np.divide(1. , Y_std, where=Y_std!=0.)
 
     # active set
     _, var = model.predict(model.X)
