@@ -61,14 +61,12 @@ class GPIK
     IK_QSegment *ltip;
 
     IK_QSegment *seg;
-
     IK_QSegment *seg2;
 
-    IK_QPositionTask *hptask;
-    IK_QPositionTask *rptask;
-    IK_QPositionTask *lptask;
-    IK_QVelocityTask *rvtask;
-    IK_QVelocityTask *lvtask;
+    IK_QPositionTask *rptask = nullptr;
+    IK_QPositionTask *lptask = nullptr;
+    IK_QVelocityTask *rvtask = nullptr;
+    IK_QVelocityTask *lvtask = nullptr;
     std::map<int, IK_QSegment *> segment_map;
     Affine3d m_rootmatrix;
 
@@ -95,9 +93,6 @@ class GPIK
         skeleton = json11::Json::parse(json_str, err);
 
         m_rootmatrix.setIdentity();
-
-        // CreateRightSolver();
-        // CreateLeftSolver();
 
     }
 
@@ -207,6 +202,10 @@ class GPIK
 
     void SetRightGlobalGoal(Vector3d &ggoal)
     {
+
+        if(rptask == nullptr)
+            return;
+
         auto &gt = skeleton[RightShoulder]["globalTranslation"].array_items();
 
         rptask->m_goal(0) = ggoal(0) - gt[0].number_value();
@@ -216,6 +215,10 @@ class GPIK
 
     void SetLeftGlobalGoal(Vector3d &ggoal)
     {
+
+        if(lptask == nullptr)
+            return;
+
         auto &gt = skeleton[LeftShoulder]["globalTranslation"].array_items();
 
         lptask->m_goal(0) = ggoal(0) - gt[0].number_value();
@@ -225,11 +228,19 @@ class GPIK
 
     void SetRightVelocityGoal(Vector3d &vgoal)
     {
+
+        if(rvtask == nullptr)
+            return;
+
         rvtask->m_goal = vgoal;
     }
 
     void SetLeftVelocityGoal(Vector3d &vgoal)
     {
+
+        if(lvtask == nullptr)
+            return;
+
         lvtask->m_goal = vgoal;
     }
 

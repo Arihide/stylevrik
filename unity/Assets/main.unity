@@ -606,6 +606,7 @@ MonoBehaviour:
   SkeletonName: skeleton_reduced.json
   GPModelName: Scene_5_rmfinger_reduced_model.json
   Point: {fileID: 356233638}
+  ikchain: 
   max_iterations: 100
   IKWeight: 0.57
 --- !u!114 &1716061827

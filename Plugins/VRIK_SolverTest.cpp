@@ -99,7 +99,7 @@ int main()
 
     // 勾配の導関数が正しいか？
     assert(check_gradient(gp, x, x_grad));
-    solver.minimize(gp, x, fx);
+    // solver.minimize(gp, x, fx);
 
     gp.load("testmodels/walk00_rmfinger_model.json");
     x.resize(gp.dim);
@@ -111,6 +111,8 @@ int main()
     // IK
     GPIK gpik;
     gpik.Initialize("testmodels/skeleton_reduced.json", gp);
+    gpik.CreateRightSolver();
+    // gpik.CreateLeftSolver();
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
     assert(check_gradient(gpik, x, x_grad));

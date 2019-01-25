@@ -31,6 +31,10 @@ public class AnimationAvator : MonoBehaviour
 
     [Range(0, 10)]public float IKWeight = 0.5f;
 
+    public bool useExample = false;
+
+    [Range(0, 79)]public int frame = 30;
+
 
     void Awake()
     {
@@ -47,8 +51,8 @@ public class AnimationAvator : MonoBehaviour
         animator = GetComponent<Animator>();
 
         solver = VRIKSolver.Create(SkeletonPath, GPModelPath);
-        VRIKSolver.CreateLeftHandSolver(solver);
         VRIKSolver.CreateRightHandSolver(solver);
+        // VRIKSolver.CreateLeftHandSolver(solver);
 
         VRIKSolver.SetLambda(solver, IKWeight);
 
@@ -62,7 +66,7 @@ public class AnimationAvator : MonoBehaviour
         Vector3 lgoal = LeftHandTarget.position;
 
         VRIKSolver.AddRightPositionGoal(solver, rgoal.x * 100, rgoal.y * 100, rgoal.z * 100);
-        VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, lgoal.y * 100, lgoal.z * 100);
+        // VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, lgoal.y * 100, lgoal.z * 100);
 
         VRIKSolver.Solve(solver);
 
@@ -126,12 +130,15 @@ public class AnimationAvator : MonoBehaviour
             VRIKSolver.GetAngle(solver, (int)neuronBones + 0, 2)
         );
 
-        // int frame = 50;
-        // Vector3 axis = new Vector3(
-        //     VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 0, frame),
-        //     VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 1, frame),
-        //     VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 2, frame)
-        // );
+        if(useExample){
+
+            axis = new Vector3(
+                VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 0, frame),
+                VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 1, frame),
+                VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 2, frame)
+            );
+        
+        }
 
         float angle = axis.magnitude;
 
