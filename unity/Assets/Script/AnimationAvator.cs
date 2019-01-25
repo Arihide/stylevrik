@@ -29,7 +29,7 @@ public class AnimationAvator : MonoBehaviour
     public int[] ikchain;
     [Range(1, 100)]public int max_iterations = 20;
 
-    [Range(0, 10)]public float IKWeight = 0.5f;
+    [Range(0, 3)]public float IKWeight = 0.01f;
 
     public bool useExample = false;
 
@@ -52,7 +52,7 @@ public class AnimationAvator : MonoBehaviour
 
         solver = VRIKSolver.Create(SkeletonPath, GPModelPath);
         VRIKSolver.CreateRightHandSolver(solver);
-        // VRIKSolver.CreateLeftHandSolver(solver);
+        VRIKSolver.CreateLeftHandSolver(solver);
 
         VRIKSolver.SetLambda(solver, IKWeight);
 
@@ -66,7 +66,7 @@ public class AnimationAvator : MonoBehaviour
         Vector3 lgoal = LeftHandTarget.position;
 
         VRIKSolver.AddRightPositionGoal(solver, rgoal.x * 100, rgoal.y * 100, rgoal.z * 100);
-        // VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, lgoal.y * 100, lgoal.z * 100);
+        VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, lgoal.y * 100, lgoal.z * 100);
 
         VRIKSolver.Solve(solver);
 

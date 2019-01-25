@@ -135,11 +135,13 @@ if __name__ == "__main__":
 
     # データの下処理
     Y = np.asarray(br.motions)
-    Y = np.asarray(mathfunc.eulers_to_expmap(Y))
+    Y = np.hstack((np.asarray(mathfunc.eulers_to_expmap(Y)), Y[:, 1][:, np.newaxis]))
     # Y = select_data_set(Y, threshold=.1)
     # Y = motion_to_features(Y)
     # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
     # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
+
+    # sys.exit()
 
     latent_dim = 3
 
@@ -147,10 +149,7 @@ if __name__ == "__main__":
 
     Y_mean = Y.mean(0)
     Y_std = Y.std(0)
-    # Y = Y[::3]
-    # Y_std = np.ones(Y_std.shape)
 
-    # これおかしい？
     Y_normalized = np.divide(Y-Y_mean, Y_std, where=Y_std!=0)
 
     # model = ScaledGPLVM(Y-Y_mean, latent_dim, kernel=kernel)
@@ -167,7 +166,7 @@ if __name__ == "__main__":
     #                    np.array([[0.1, 0.2, 0.3]])))
 
     # smooth model
-    model.Y = add_gaussian_noise(model.Y, noise_variance=0.0001)
+    model.Y = add_gaussian_noise(model.Y, noise_variance=0.005)
     model.unlink_parameter(model.X)
     # model.unlink_parameter(model.S)
     model.optimize(messages=1, max_iters=5e20)
