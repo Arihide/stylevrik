@@ -108,3 +108,18 @@ class ScaledGPLVM(GP):
 
         self.X.gradient = self.kern.gradients_X(
             self.grad_dict['dL_dK'], self.X, None) - self.X
+
+if __name__ == "__main__":
+
+    from bvh_reader import BVHReader
+    import GPy
+
+    br = BVHReader('bvh/walk00_rmfinger.bvh')
+    br.read()
+
+    Y = np.asarray(br.motions)
+    kernel = GPy.kern.RBF(3)
+
+    m = ScaledGPLVM(Y-Y.mean(0), 3, kernel=kernel)
+
+    print(m.checkgrad())
