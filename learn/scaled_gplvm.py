@@ -8,41 +8,41 @@ from GPy.util import diag
 from GPy.util.linalg import pdinv, dpotrs, tdot
 
 
-class Scale(Mapping):
+# class Scale(Mapping):
 
-    def __init__(self, input_dim, name='scalemap'):
-        super(Scale, self).__init__(
-            input_dim=input_dim, output_dim=input_dim, name=name)
-        self.S = Param('S', np.random.randn(self.input_dim))
-        # self.link_parameter(self.S)
+#     def __init__(self, input_dim, name='scalemap'):
+#         super(Scale, self).__init__(
+#             input_dim=input_dim, output_dim=input_dim, name=name)
+#         self.S = Param('S', np.random.randn(self.input_dim))
+#         # self.link_parameter(self.S)
 
-    def f(self, X):
-        return X * self.S
+#     def f(self, X):
+#         return X * self.S
 
-    def update_gradients(self, dL_dF, X):
-        # そのままかければよいはず
-        self.S.gradient = X * dL_dF
+#     def update_gradients(self, dL_dF, X):
+#         # そのままかければよいはず
+#         self.S.gradient = X * dL_dF
 
-    def gradients_X(self, dL_dF, X):
-        return dL_dF * self.S
+#     def gradients_X(self, dL_dF, X):
+#         return dL_dF * self.S
 
-    def to_dict(self):
-        """
-        Convert the object into a json serializable dictionary.
+#     def to_dict(self):
+#         """
+#         Convert the object into a json serializable dictionary.
 
-        Note: It uses the private method _save_to_input_dict of the parent.
+#         Note: It uses the private method _save_to_input_dict of the parent.
 
-        :return dict: json serializable dictionary containing the needed information to instantiate the object
-        """
+#         :return dict: json serializable dictionary containing the needed information to instantiate the object
+#         """
 
-        input_dict = super(Linear, self)._save_to_input_dict()
-        input_dict["class"] = "GPy.mappings.Scale"
-        input_dict["S"] = self.S.values.tolist()
-        return input_dict
+#         input_dict = super(Linear, self)._save_to_input_dict()
+#         input_dict["class"] = "GPy.mappings.Scale"
+#         input_dict["S"] = self.S.values.tolist()
+#         return input_dict
 
-    @staticmethod
-    def _build_from_input_dict(mapping_class, input_dict):
-        import copy
+#     @staticmethod
+#     def _build_from_input_dict(mapping_class, input_dict):
+#         import copy
 
 
 class ScaledGPLVM(GP):
@@ -50,7 +50,8 @@ class ScaledGPLVM(GP):
     def __init__(self, Y, input_dim=2, kernel=None):
         X, fracs = initialize_latent('PCA', input_dim, Y)
         # self.mapping = Scale(Y.shape[1])
-        self.S = Param('S', np.ones(Y.shape[1]))
+        # self.S = Param('S', np.ones(Y.shape[1]))
+        self.S = Param('S', np.zeros(Y.shape[1]))
 
         likelihood = Gaussian()
 
@@ -65,13 +66,14 @@ class ScaledGPLVM(GP):
 
     def log_likelihood(self):
         return super(ScaledGPLVM, self).log_likelihood() +\
-            self.Y.shape[0] * np.log(self.S).sum() -\
+            self.Y.shape[0] * self.S.sum() -\
             0.5 * np.sum(self.X**2) -\
             np.log(self.kern.variance) + 2 * np.log(self.kern.lengthscale) + np.log(self.likelihood.variance)
 
 
     def parameters_changed(self):
-        self.Y_normalized = self.S * self.Y
+
+        self.Y_normalized = np.exp(self.S) * self.Y
 
         # A = (2 * self.S * self.Y).T.reshape(self.Y.shape[1], self.Y.shape[0], 1)
         # B = self.Y.T.reshape(self.Y.shape[1], 1, self.Y.shape[0])
@@ -90,8 +92,8 @@ class ScaledGPLVM(GP):
         # grad = -1. * np.diag(np.matmul((self.S * alpha).T,
         #                                YYT_factor)) + self.Y.shape[0] / self.S
 
-        grad = -1. * self.S * (alpha * YYT_factor).sum(0) + \
-            self.Y.shape[0] / self.S
+        grad = -1. * np.exp(self.S) * (alpha * YYT_factor).sum(0) * np.exp(self.S) + \
+            self.Y.shape[0] * np.ones(self.Y.shape[1])
 
         # print((alpha).shape)
         # print((alpha * YYT_factor).shape)

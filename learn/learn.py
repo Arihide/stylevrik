@@ -135,13 +135,20 @@ if __name__ == "__main__":
 
     # データの下処理
     Y = np.asarray(br.motions)
-    Y = np.hstack((np.asarray(mathfunc.eulers_to_expmap(Y)), Y[:, 1][:, np.newaxis]))
+    # Y = np.asarray(mathfunc.eulers_to_expmap(Y))
+
+    pos = Y[:, 1][:, np.newaxis] - 93.594000
+
+    Y = np.hstack((np.asarray(mathfunc.eulers_to_expmap(Y)), pos))
     # Y = select_data_set(Y, threshold=.1)
     # Y = motion_to_features(Y)
     # Y = np.hstack((Y, calculate_effector_velocity(16, br)))
     # Y = np.hstack((Y, calculate_effector_velocity(39, br)))
 
-    # sys.exit()
+    zero_indices = np.where(Y==0)[0]
+
+    Y = Y[:, Y[0]!=0]
+
 
     latent_dim = 3
 
@@ -150,10 +157,13 @@ if __name__ == "__main__":
     Y_mean = Y.mean(0)
     Y_std = Y.std(0)
 
-    Y_normalized = np.divide(Y-Y_mean, Y_std, where=Y_std!=0)
+    # Y_normalized = np.divide(Y-Y_mean, Y_std, where=Y_std!=0)
+    # print(Y_normalized)
+    # sys.exit()
 
-    # model = ScaledGPLVM(Y-Y_mean, latent_dim, kernel=kernel)
-    model = GPy.models.GPLVM(Y_normalized, latent_dim, kernel=kernel)
+    model = ScaledGPLVM(Y-Y_mean, latent_dim, kernel=kernel)
+    # model = ScaledGPLVM(Y_normalized, latent_dim, kernel=kernel)
+    # model = GPy.models.GPLVM(Y_normalized, latent_dim, kernel=kernel)
     # model = GPy.models.BCGPLVM(Y_normalized, latent_dim, kernel=kernel)
 
     #optimize
@@ -168,7 +178,7 @@ if __name__ == "__main__":
     # smooth model
     model.Y = add_gaussian_noise(model.Y, noise_variance=0.005)
     model.unlink_parameter(model.X)
-    # model.unlink_parameter(model.S)
+    model.unlink_parameter(model.S)
     model.optimize(messages=1, max_iters=5e20)
 
     # model = select_active_set(model)
@@ -182,8 +192,8 @@ if __name__ == "__main__":
     #     model.Y_normalized.shape[0]), figure=figure, legend=False)
 
     # GPy.plotting.show(canvas, filename='wishart_metric_notebook')
-    # Y_std = model.S
-    Y_std = np.divide(1. , Y_std, where=Y_std!=0.)
+    Y_std = np.exp(model.S)
+    # Y_std = np.divide(1. , Y_std, where=Y_std!=0.)
 
     # active set
     _, var = model.predict(model.X)

@@ -604,11 +604,11 @@ MonoBehaviour:
   RightHandTarget: {fileID: 180542776}
   HeadTarget: {fileID: 2128534305}
   SkeletonName: skeleton_reduced.json
-  GPModelName: Scene_5_rmfinger_reduced_model_vertical.json
+  GPModelName: Scene_5_rmfinger_reduced_model_added.json
   Point: {fileID: 356233638}
   ikchain: 
   max_iterations: 100
-  IKWeight: 0.01
+  IKWeight: 0.06
   useExample: 0
   frame: 30
 --- !u!114 &1716061827
@@ -715,7 +715,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1717863471}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.9378662, z: 0}
+  m_LocalPosition: {x: 0, y: -0.93594, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 1286964418}

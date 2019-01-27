@@ -12,3 +12,5 @@ stationary内の _scaled_dist
 kernel.variance = α
 gaussian.variance = β^-1
 
+分散０は除去したほうが良い？
+

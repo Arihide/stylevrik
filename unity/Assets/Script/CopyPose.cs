@@ -75,12 +75,20 @@ public class CopyPose : MonoBehaviour
         CopyRotation(SourceAnimator, animator, HumanBodyBones.LeftLittleIntermediate);
         CopyRotation(SourceAnimator, animator, HumanBodyBones.LeftLittleDistal);
 
+        CopyPosition(SourceAnimator, animator, HumanBodyBones.Hips);
+
     }
 
     void CopyRotation(Animator source, Animator target, HumanBodyBones bone)
     {
 
         target.GetBoneTransform(bone).localRotation = source.GetBoneTransform(bone).localRotation;
+
+    }
+    void CopyPosition(Animator source, Animator target, HumanBodyBones bone)
+    {
+
+        target.GetBoneTransform(bone).localPosition = source.GetBoneTransform(bone).localPosition;
 
     }
 

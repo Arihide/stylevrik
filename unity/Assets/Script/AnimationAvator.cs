@@ -27,13 +27,15 @@ public class AnimationAvator : MonoBehaviour
     public Transform Point;
 
     public int[] ikchain;
-    [Range(1, 100)]public int max_iterations = 20;
+    [Range(1, 100)] public int max_iterations = 20;
 
-    [Range(0, 3)]public float IKWeight = 0.01f;
+    [Range(0, 3)] public float IKWeight = 0.01f;
 
     public bool useExample = false;
 
-    [Range(0, 79)]public int frame = 30;
+    [Range(0, 79)] public int frame = 30;
+
+    private Vector3 initialHipPos;
 
 
     void Awake()
@@ -58,15 +60,20 @@ public class AnimationAvator : MonoBehaviour
 
         VRIKSolver.SetMaxIterations(solver, max_iterations);
 
+        initialHipPos = animator.GetBoneTransform(HumanBodyBones.Hips).position;
+
     }
 
     void Update()
     {
+
+        Transform t = animator.GetBoneTransform(HumanBodyBones.Hips);
+
         Vector3 rgoal = RightHandTarget.position;
         Vector3 lgoal = LeftHandTarget.position;
 
-        VRIKSolver.AddRightPositionGoal(solver, rgoal.x * 100, rgoal.y * 100, rgoal.z * 100);
-        VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, lgoal.y * 100, lgoal.z * 100);
+        VRIKSolver.AddRightPositionGoal(solver, rgoal.x * 100, (rgoal.y) * 100, rgoal.z * 100);
+        VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, (lgoal.y) * 100, lgoal.z * 100);
 
         VRIKSolver.Solve(solver);
 
@@ -104,6 +111,9 @@ public class AnimationAvator : MonoBehaviour
         // SetRotation(animator, HumanBodyBones.LeftHand, GetReceivedRotation(SkeletonBones.LeftHand));
         // animator.GetBoneTransform(HumanBodyBones.LeftHand).localRotation = LeftHandTarget.rotation;
 
+
+        t.position = initialHipPos +  new Vector3(0f, GetVerticalPosition(), 0f);
+
     }
 
     void SetRotation(Animator animator, HumanBodyBones bone, Quaternion rotation)
@@ -130,14 +140,15 @@ public class AnimationAvator : MonoBehaviour
             VRIKSolver.GetAngle(solver, (int)neuronBones + 0, 2)
         );
 
-        if(useExample){
+        if (useExample)
+        {
 
             axis = new Vector3(
                 VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 0, frame),
                 VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 1, frame),
                 VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 2, frame)
             );
-        
+
         }
 
         float angle = axis.magnitude;
@@ -146,6 +157,12 @@ public class AnimationAvator : MonoBehaviour
 
         return Quaternion.AngleAxis(angle * Mathf.Rad2Deg, axis);
 
+    }
+
+    float GetVerticalPosition()
+    {
+
+        return VRIKSolver.GetAngle(solver, (int)(SkeletonBones.NumOfBones), 0) * 0.01f;
     }
 
 }
@@ -174,5 +191,5 @@ public enum SkeletonBones
     LeftArm = 18,
     LeftForeArm = 19,
     LeftHand = 20,
-    NumOfBones
+    NumOfBones = 21
 }
