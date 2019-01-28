@@ -33,10 +33,13 @@ public static class VRIKSolver
     public static extern void AddLeftVelocityGoal(IntPtr solver, float goal_x, float goal_y, float goal_z);
     
     [DllImport("VRIKSolver")]
-    public static extern float GetAngle(IntPtr solver, int boneIndex, int eulerIndex);
+    public static extern float GetAngle(IntPtr solver, int boneIndex, int angleIndex);
     
     [DllImport("VRIKSolver")]
-    public static extern float GetExampleAngle(IntPtr solver, int boneIndex, int eulerIndex, int frame);
+    public static extern float GetExampleAngle(IntPtr solver, int boneIndex, int angleIndex, int frame);
+
+    [DllImport("VRIKSolver")]
+    public static extern float GetMeanAngle(IntPtr solver, int boneIndex, int angleIndex);
 
     [DllImport("VRIKSolver")]
     public static extern float GetLatentVariable(IntPtr solver, int index);

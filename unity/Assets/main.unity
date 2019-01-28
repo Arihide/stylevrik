@@ -604,11 +604,11 @@ MonoBehaviour:
   RightHandTarget: {fileID: 180542776}
   HeadTarget: {fileID: 2128534305}
   SkeletonName: skeleton_reduced.json
-  GPModelName: Scene_5_rmfinger_reduced_model_added.json
+  GPModelName: Scene_5_rmfinger_reduced_removeY_model_added.json
   Point: {fileID: 356233638}
   ikchain: 
   max_iterations: 100
-  IKWeight: 0.06
+  IKWeight: 0.05
   useExample: 0
   frame: 30
 --- !u!114 &1716061827

@@ -75,6 +75,7 @@ public class CopyPose : MonoBehaviour
         CopyRotation(SourceAnimator, animator, HumanBodyBones.LeftLittleIntermediate);
         CopyRotation(SourceAnimator, animator, HumanBodyBones.LeftLittleDistal);
 
+        CopyRotation(SourceAnimator, animator, HumanBodyBones.Hips);
         CopyPosition(SourceAnimator, animator, HumanBodyBones.Hips);
 
     }

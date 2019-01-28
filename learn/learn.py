@@ -137,6 +137,11 @@ if __name__ == "__main__":
     Y = np.asarray(br.motions)
     # Y = np.asarray(mathfunc.eulers_to_expmap(Y))
 
+    # Rootの回転をX軸周りだけにする
+    Y[:, 3].fill(0)
+    # Y[:, 5].fill(0)
+
+    # キャラクタの高さ
     pos = Y[:, 1][:, np.newaxis] - 93.594000
 
     Y = np.hstack((np.asarray(mathfunc.eulers_to_expmap(Y)), pos))

@@ -26,7 +26,6 @@ public class AnimationAvator : MonoBehaviour
 
     public Transform Point;
 
-    public int[] ikchain;
     [Range(1, 100)] public int max_iterations = 20;
 
     [Range(0, 3)] public float IKWeight = 0.01f;
@@ -72,12 +71,15 @@ public class AnimationAvator : MonoBehaviour
         Vector3 rgoal = RightHandTarget.position;
         Vector3 lgoal = LeftHandTarget.position;
 
-        VRIKSolver.AddRightPositionGoal(solver, rgoal.x * 100, (rgoal.y) * 100, rgoal.z * 100);
-        VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, (lgoal.y) * 100, lgoal.z * 100);
+        VRIKSolver.AddRightPositionGoal(solver, rgoal.x * 100, (rgoal.y + (initialHipPos.y - t.position.y)) * 100, rgoal.z * 100);
+        VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, (lgoal.y + (initialHipPos.y - t.position.y)) * 100, lgoal.z * 100);
 
         VRIKSolver.Solve(solver);
 
         Point.localPosition = new Vector3(VRIKSolver.GetLatentVariable(solver, 0), VRIKSolver.GetLatentVariable(solver, 1), 0);
+
+        // hips
+        SetRotation(animator, HumanBodyBones.Hips, GetReceivedRotation(SkeletonBones.Hips));
 
         // legs
         SetRotation(animator, HumanBodyBones.RightUpperLeg, GetReceivedRotation(SkeletonBones.RightUpLeg));
@@ -111,22 +113,19 @@ public class AnimationAvator : MonoBehaviour
         // SetRotation(animator, HumanBodyBones.LeftHand, GetReceivedRotation(SkeletonBones.LeftHand));
         // animator.GetBoneTransform(HumanBodyBones.LeftHand).localRotation = LeftHandTarget.rotation;
 
-
         t.position = initialHipPos +  new Vector3(0f, GetVerticalPosition(), 0f);
 
     }
 
-    void SetRotation(Animator animator, HumanBodyBones bone, Quaternion rotation)
+    void SetRotation(Animator animator, HumanBodyBones bone, Quaternion rot)
     {
         Transform t = animator.GetBoneTransform(bone);
         if (t != null)
         {
-            // Quaternion rot = Quaternion.Euler(rotation);
-            // if (!float.IsNaN(rot.x) && !float.IsNaN(rot.y) && !float.IsNaN(rot.z) && !float.IsNaN(rot.w))
-            // {
-            //     t.localRotation = rot;
-            // }
-            t.localRotation = rotation;
+            if (!float.IsNaN(rot.x) && !float.IsNaN(rot.y) && !float.IsNaN(rot.z) && !float.IsNaN(rot.w))
+            {
+                t.localRotation = rot;
+            }
         }
     }
 
@@ -149,6 +148,11 @@ public class AnimationAvator : MonoBehaviour
                 VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 2, frame)
             );
 
+            axis = new Vector3(
+                VRIKSolver.GetMeanAngle(solver, (int)neuronBones + 0, 0),
+                VRIKSolver.GetMeanAngle(solver, (int)neuronBones + 0, 1),
+                VRIKSolver.GetMeanAngle(solver, (int)neuronBones + 0, 2)
+            );
         }
 
         float angle = axis.magnitude;
@@ -161,7 +165,6 @@ public class AnimationAvator : MonoBehaviour
 
     float GetVerticalPosition()
     {
-
         return VRIKSolver.GetAngle(solver, (int)(SkeletonBones.NumOfBones), 0) * 0.01f;
     }
 

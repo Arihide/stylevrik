@@ -60,13 +60,13 @@ class GPIK
     IK_QSegment *lroot;
     IK_QSegment *ltip;
 
-    IK_QSegment *seg;
-    IK_QSegment *seg2;
+    IK_QSegment *rmid;
+    IK_QSegment *lmid;
 
-    IK_QPositionTask *rptask = nullptr;
-    IK_QPositionTask *lptask = nullptr;
-    IK_QVelocityTask *rvtask = nullptr;
-    IK_QVelocityTask *lvtask = nullptr;
+    IK_QPositionTask *rptask;
+    IK_QPositionTask *lptask;
+    IK_QVelocityTask *rvtask;
+    IK_QVelocityTask *lvtask;
     std::map<int, IK_QSegment *> segment_map;
     Affine3d m_rootmatrix;
 
@@ -94,27 +94,37 @@ class GPIK
 
         m_rootmatrix.setIdentity();
 
+        rptask = nullptr;
+        lptask = nullptr;
+        rvtask = nullptr;
+        lvtask = nullptr;
+
+        segment_map.clear();
+        solvers.clear();
+
+        ifs.close();
+
     }
 
     void CreateRightSolver(){
 
         rroot = CreateSegment(RightShoulder);
-        seg = CreateSegment(RightArm);      // RightArm
+        rmid = CreateSegment(RightArm);      // RightArm
         rtip = CreateSegment(RightForeArm); // RightForeArm
 
         SetSegmentTransform(rroot, RightArm);
-        SetSegmentTransform(seg, RightForeArm);
+        SetSegmentTransform(rmid, RightForeArm);
         SetSegmentTransform(rtip, RightHand);
         
         segment_map[RightShoulder] = rroot;
-        segment_map[RightArm] = seg;
+        segment_map[RightArm] = rmid;
         segment_map[RightForeArm] = rtip;
 
-        rtip->SetParent(seg);
-        seg->SetParent(rroot);
+        rtip->SetParent(rmid);
+        rmid->SetParent(rroot);
 
         rroot->SetDoFId(0);
-        seg->SetDoFId(3);
+        rmid->SetDoFId(3);
         rtip->SetDoFId(6);
 
         rroot->UpdateTransform(m_rootmatrix);
@@ -142,20 +152,20 @@ class GPIK
 
     void CreateLeftSolver(){
         lroot = CreateSegment(LeftShoulder);
-        seg2 = CreateSegment(LeftArm);
+        lmid = CreateSegment(LeftArm);
         ltip = CreateSegment(LeftForeArm);
         SetSegmentTransform(lroot, LeftArm);
-        SetSegmentTransform(seg2, LeftForeArm);
+        SetSegmentTransform(lmid, LeftForeArm);
         SetSegmentTransform(ltip, LeftHand);
         segment_map[LeftShoulder] = lroot;
-        segment_map[LeftArm] = seg2;
+        segment_map[LeftArm] = lmid;
         segment_map[LeftForeArm] = ltip;
 
-        ltip->SetParent(seg2);
-        seg2->SetParent(lroot);
+        ltip->SetParent(lmid);
+        lmid->SetParent(lroot);
 
         lroot->SetDoFId(0);
-        seg2->SetDoFId(3);
+        lmid->SetDoFId(3);
         ltip->SetDoFId(6);
 
         Vector3d goal(1, 10, 1);
@@ -308,7 +318,6 @@ class GPIK
 
             std::list<IK_QPositionTask *>::iterator task;
             IK_QJacobian *jac = (*solver)->jacobian;
-
 
             (*solver)->root->UpdateTransform(m_rootmatrix);
 

@@ -111,8 +111,8 @@ int main()
     // IK
     GPIK gpik;
     gpik.Initialize("testmodels/skeleton_reduced.json", gp);
-    gpik.CreateRightSolver();
-    // gpik.CreateLeftSolver();
+    // gpik.CreateRightSolver();
+    gpik.CreateLeftSolver();
     x = VectorXd::Zero(gp.dim);
     x_grad = VectorXd::Zero(gp.dim);
     assert(check_gradient(gpik, x, x_grad));

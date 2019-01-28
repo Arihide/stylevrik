@@ -4,13 +4,13 @@ from bvh_reader import BVHReader
 
 if __name__ == '__main__':
 
-    N = 60
-    # N = 130
+    # N = 60
+    N = 130
 
     # Scene_5_rmfinger_reduced.bvh 
     extract_indices = np.hstack((
-        np.linspace(123, 391, N).astype(np.int),
-        np.linspace(615, 802, N).astype(np.int),
+        np.linspace(110, 544, N).astype(np.int),
+        np.linspace(816, 1264, N).astype(np.int),
     ))
 
     try:
