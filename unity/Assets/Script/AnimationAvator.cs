@@ -26,9 +26,9 @@ public class AnimationAvator : MonoBehaviour
 
     public Transform Point;
 
-    [Range(1, 100)] public int max_iterations = 20;
+    [Range(1, 300)] public int max_iterations = 20;
 
-    [Range(0, 3)] public float IKWeight = 0.01f;
+    public float IKWeight = 0.01f;
 
     public bool useExample = false;
 
@@ -73,6 +73,8 @@ public class AnimationAvator : MonoBehaviour
 
         VRIKSolver.AddRightPositionGoal(solver, rgoal.x * 100, (rgoal.y + (initialHipPos.y - t.position.y)) * 100, rgoal.z * 100);
         VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, (lgoal.y + (initialHipPos.y - t.position.y)) * 100, lgoal.z * 100);
+
+        VRIKSolver.SetLambda(solver, IKWeight);
 
         VRIKSolver.Solve(solver);
 

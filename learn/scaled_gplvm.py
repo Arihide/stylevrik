@@ -64,6 +64,7 @@ class ScaledGPLVM(GP):
         self.link_parameter(self.X, index=0)
         self.link_parameter(self.S)
 
+    # これの負が目的関数
     def log_likelihood(self):
         return super(ScaledGPLVM, self).log_likelihood() +\
             self.Y.shape[0] * self.S.sum() -\

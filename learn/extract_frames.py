@@ -5,12 +5,20 @@ from bvh_reader import BVHReader
 if __name__ == '__main__':
 
     # N = 60
-    N = 130
+    N = 600
 
-    # Scene_5_rmfinger_reduced.bvh 
+    # # Scene_5_rmfinger_reduced.bvh 
+    # extract_indices = np.hstack((
+    #     np.linspace(110, 544, N).astype(np.int),
+    #     np.linspace(816, 1264, N).astype(np.int),
+    # ))
+
+    N = 100
     extract_indices = np.hstack((
-        np.linspace(110, 544, N).astype(np.int),
-        np.linspace(816, 1264, N).astype(np.int),
+        np.linspace(0, 1268, N).astype(np.int),
+        np.linspace(1503, 2672, N).astype(np.int),
+        np.linspace(11805, 12202, N).astype(np.int),
+        np.linspace(13090, 14336, N).astype(np.int),
     ))
 
     try:

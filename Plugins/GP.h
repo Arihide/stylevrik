@@ -44,10 +44,11 @@ class GP
 
     std::vector<VectorXd *> inputs;
 
-    // RBFカーネルはこれで間違いないはず
+    // RBFカーネルはこれで間違いないはず (kernel_lengthscale^2)かkernel_lengthscaleか
     inline double rbf(const VectorXd &x1, const VectorXd &x2)
     {
-        return kernel_variance * exp(-0.5 * (x1 - x2).squaredNorm() / (kernel_lengthscale));
+        // return kernel_variance * exp(-0.5 * (x1 - x2).squaredNorm() / (kernel_lengthscale));
+        return kernel_variance * exp(-0.5 * (x1 - x2).squaredNorm() / (kernel_lengthscale * kernel_lengthscale));
     }
 
     // GPyで生成したパラメータの読み込み。
@@ -158,7 +159,8 @@ class GP
         _dk_stardx.resize(N, x_dim);
         for (int ix = 0; ix < N; ix++)
         {
-            _dk_stardx.row(ix) = ((*inputs[ix]) - x) * k_star(ix) / (kernel_lengthscale);
+            // _dk_stardx.row(ix) = ((*inputs[ix]) - x) * k_star(ix) / (kernel_lengthscale);
+            _dk_stardx.row(ix) = ((*inputs[ix]) - x) * k_star(ix) / (kernel_lengthscale * kernel_lengthscale);
         }
         return _dk_stardx;
     }

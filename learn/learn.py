@@ -93,11 +93,6 @@ def save_model(model, Y, mean, std, output_filename='testmodel'):
     with open(output_filename + ".json", "w") as outfile:
         json.dump(output_dict, outfile)
 
-
-def add_gaussian_noise(arr, noise_variance=0.05):
-    return arr + np.random.normal(0.0, noise_variance, arr.shape)
-
-
 def select_active_set(model, M=50):
 
     mu, var = model.predict(model.X)
@@ -154,7 +149,6 @@ if __name__ == "__main__":
 
     Y = Y[:, Y[0]!=0]
 
-
     latent_dim = 3
 
     kernel = GPy.kern.RBF(input_dim=latent_dim, lengthscale=None, ARD=False)
@@ -181,7 +175,7 @@ if __name__ == "__main__":
     #                    np.array([[0.1, 0.2, 0.3]])))
 
     # smooth model
-    model.Y = add_gaussian_noise(model.Y, noise_variance=0.005)
+    model.Y = model.Y + np.random.normal(0.0, 0.00001 * np.exp(model.S)[np.newaxis, :], model.Y.shape)
     model.unlink_parameter(model.X)
     model.unlink_parameter(model.S)
     model.optimize(messages=1, max_iters=5e20)
@@ -200,9 +194,10 @@ if __name__ == "__main__":
     Y_std = np.exp(model.S)
     # Y_std = np.divide(1. , Y_std, where=Y_std!=0.)
 
+    active_num = 200
     # active set
     _, var = model.predict(model.X)
-    indices = var.flatten().argsort()[-80:]
+    indices = var.flatten().argsort()[-active_num:]
     X = model.X[indices]
 
     model =  GPy.core.GP(
