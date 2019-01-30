@@ -31,6 +31,19 @@ public class AnimationAvator : MonoBehaviour
     public float IKWeight = 0.01f;
 
     private double kernel_lengthscale = 0.1;
+    private double kernel_variance;
+    private double gaussian_variance;
+
+    public double KernelLengthScale
+    {
+        get { return kernel_lengthscale; }
+    }
+    public double KernelVariance{
+        get{return kernel_variance; }
+    }
+    public double GaussianVariance{
+        get{return gaussian_variance; }
+    }
 
     public bool useExample = false;
 
@@ -63,6 +76,8 @@ public class AnimationAvator : MonoBehaviour
         initialHipPos = animator.GetBoneTransform(HumanBodyBones.Hips).position;
 
         kernel_lengthscale = VRIKSolver.GetKernelLengthScale(solver);
+        kernel_variance = VRIKSolver.GetKernelVariance(solver);
+        gaussian_variance = VRIKSolver.GetGaussianVariance(solver);
 
         Debug.Log(kernel_lengthscale);
 
@@ -82,25 +97,50 @@ public class AnimationAvator : MonoBehaviour
         Vector2 Rthumb = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick);
         Vector2 Lthumb = OVRInput.Get(OVRInput.RawAxis2D.LThumbstick);
 
-        if(Rthumb.x != 0.0f){
+        if (Rthumb.x != 0.0f)
+        {
 
             IKWeight += Rthumb.x * 1e-2f;
 
-            if(IKWeight < 0.0f)
+            if (IKWeight < 0.0f)
                 IKWeight = 0.0f;
 
             VRIKSolver.SetLambda(solver, IKWeight);
 
         }
 
-        if(Lthumb.x != 0.0f){
+        if (Lthumb.x != 0.0f)
+        {
 
-            kernel_lengthscale += (double)Lthumb.x * 1e-3;
+            if (OVRInput.Get(OVRInput.RawAxis1D.LIndexTrigger) > 0.3f)
+            {
+                kernel_variance += (double)Lthumb.x * 1e-2;
 
-            if(kernel_lengthscale < 0.0)
-                kernel_lengthscale = 0.0;
+                if (kernel_variance < 0.0)
+                    kernel_variance = 0.0;
 
-            VRIKSolver.SetKernelLengthScale(solver, kernel_lengthscale);
+                VRIKSolver.SetKernelVariance(solver, kernel_variance);
+            }
+            else if (OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.3f)
+            {
+                gaussian_variance += (double)Lthumb.x * 1e-2;
+
+                if (gaussian_variance < 0.0)
+                    gaussian_variance = 0.0;
+
+                VRIKSolver.SetGaussianVariance(solver, gaussian_variance);
+            }
+            else
+            {
+
+                kernel_lengthscale += (double)Lthumb.x * 1e-2;
+
+                if (kernel_lengthscale < 0.0)
+                    kernel_lengthscale = 0.0;
+
+                VRIKSolver.SetKernelLengthScale(solver, kernel_lengthscale);
+
+            }
 
         }
 
@@ -143,7 +183,7 @@ public class AnimationAvator : MonoBehaviour
         // SetRotation(animator, HumanBodyBones.LeftHand, GetReceivedRotation(SkeletonBones.LeftHand));
         // animator.GetBoneTransform(HumanBodyBones.LeftHand).localRotation = LeftHandTarget.rotation;
 
-        t.position = initialHipPos +  new Vector3(0f, GetVerticalPosition(), 0f);
+        t.position = initialHipPos + new Vector3(0f, GetVerticalPosition(), 0f);
 
     }
 
