@@ -30,6 +30,8 @@ public class AnimationAvator : MonoBehaviour
 
     public float IKWeight = 0.01f;
 
+    private double kernel_lengthscale = 0.1;
+
     public bool useExample = false;
 
     [Range(0, 79)] public int frame = 30;
@@ -56,10 +58,13 @@ public class AnimationAvator : MonoBehaviour
         VRIKSolver.CreateLeftHandSolver(solver);
 
         VRIKSolver.SetLambda(solver, IKWeight);
-
         VRIKSolver.SetMaxIterations(solver, max_iterations);
 
         initialHipPos = animator.GetBoneTransform(HumanBodyBones.Hips).position;
+
+        kernel_lengthscale = VRIKSolver.GetKernelLengthScale(solver);
+
+        Debug.Log(kernel_lengthscale);
 
     }
 
@@ -74,7 +79,30 @@ public class AnimationAvator : MonoBehaviour
         VRIKSolver.AddRightPositionGoal(solver, rgoal.x * 100, (rgoal.y + (initialHipPos.y - t.position.y)) * 100, rgoal.z * 100);
         VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, (lgoal.y + (initialHipPos.y - t.position.y)) * 100, lgoal.z * 100);
 
-        VRIKSolver.SetLambda(solver, IKWeight);
+        Vector2 Rthumb = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick);
+        Vector2 Lthumb = OVRInput.Get(OVRInput.RawAxis2D.LThumbstick);
+
+        if(Rthumb.x != 0.0f){
+
+            IKWeight += Rthumb.x * 1e-2f;
+
+            if(IKWeight < 0.0f)
+                IKWeight = 0.0f;
+
+            VRIKSolver.SetLambda(solver, IKWeight);
+
+        }
+
+        if(Lthumb.x != 0.0f){
+
+            kernel_lengthscale += (double)Lthumb.x * 1e-3;
+
+            if(kernel_lengthscale < 0.0)
+                kernel_lengthscale = 0.0;
+
+            VRIKSolver.SetKernelLengthScale(solver, kernel_lengthscale);
+
+        }
 
         VRIKSolver.Solve(solver);
 
@@ -134,7 +162,6 @@ public class AnimationAvator : MonoBehaviour
     Quaternion GetReceivedRotation(SkeletonBones neuronBones)
     {
         // Log Quaternion
-
         Vector3 axis = new Vector3(
             VRIKSolver.GetAngle(solver, (int)neuronBones + 0, 0),
             VRIKSolver.GetAngle(solver, (int)neuronBones + 0, 1),

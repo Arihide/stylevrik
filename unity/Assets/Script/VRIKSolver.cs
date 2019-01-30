@@ -18,6 +18,24 @@ public static class VRIKSolver
     public static extern void SetLambda(IntPtr solver, float lambda);
 
     [DllImport("VRIKSolver")]
+    public static extern void SetKernelVariance(IntPtr solver, double kernel_variance);
+
+    [DllImport("VRIKSolver")]
+    public static extern void SetKernelLengthScale(IntPtr solver, double kernel_lengthscale);
+
+    [DllImport("VRIKSolver")]
+    public static extern void SetGaussianVariance(IntPtr solver, double gaussian_variance);
+
+    [DllImport("VRIKSolver")]
+    public static extern double GetKernelVariance(IntPtr solver);
+
+    [DllImport("VRIKSolver")]
+    public static extern double GetKernelLengthScale(IntPtr solver);
+
+    [DllImport("VRIKSolver")]
+    public static extern double GetGaussianVariance(IntPtr solver);
+
+    [DllImport("VRIKSolver")]
     public static extern void Solve(IntPtr solver);
 
     [DllImport("VRIKSolver")]

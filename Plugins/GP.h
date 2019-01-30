@@ -44,7 +44,8 @@ class GP
 
     std::vector<VectorXd *> inputs;
 
-    // RBFカーネルはこれで間違いないはず (kernel_lengthscale^2)かkernel_lengthscaleか
+    // (kernel_lengthscale^2)が本来正しいはず
+    // kernel_lengthscale　だと歩行でうまくいく
     inline double rbf(const VectorXd &x1, const VectorXd &x2)
     {
         // return kernel_variance * exp(-0.5 * (x1 - x2).squaredNorm() / (kernel_lengthscale));
@@ -100,6 +101,8 @@ class GP
         kernel_variance = json["kernel"]["variance"][0].number_value();
         kernel_lengthscale = json["kernel"]["lengthscale"][0].number_value();
         gaussian_variance = json["likelihood"]["variance"][0].number_value();
+
+        kernel_lengthscale = sqrt(kernel_lengthscale);
 
         // 共分散行列（カーネル行列）の計算
         // 対称行列なので下半分だけ求めればよいはず
