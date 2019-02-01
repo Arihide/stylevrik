@@ -295,7 +295,10 @@ class GPIK
                 (*task)->ComputeExpMapJacobian(*jac, x.segment((*solver)->rootID * 3, matrow));
             }
 
-            x_grad.segment((*solver)->rootID * 3, matrow) += -jac->m_jacobian.transpose() * jac->m_beta * lambda;
+            jac->Transpose();
+
+            // x_grad.segment((*solver)->rootID * 3, matrow) += -jac->m_jacobian.transpose() * jac->m_beta * lambda;
+            x_grad.segment((*solver)->rootID * 3, matrow) += -jac->m_d_theta * lambda;
 
             obj += jac->m_beta.head(3).squaredNorm() * 0.5 * lambda;
 
