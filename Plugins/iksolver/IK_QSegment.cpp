@@ -30,14 +30,13 @@
  *  \ingroup iksolver
  */
 
-
 #include "IK_QSegment.h"
 
 // IK_QSegment
 
 IK_QSegment::IK_QSegment(int num_DoF, bool translational)
 	: m_parent(NULL), m_child(NULL), m_sibling(NULL), m_composite(NULL),
-	m_num_DoF(num_DoF), m_translational(translational)
+	  m_num_DoF(num_DoF), m_translational(translational)
 {
 	m_locked[0] = m_locked[1] = m_locked[2] = false;
 	m_weight[0] = m_weight[1] = m_weight[2] = 1.0;
@@ -66,13 +65,12 @@ void IK_QSegment::Reset()
 }
 
 void IK_QSegment::SetTransform(
-    const Vector3d& start,
-    const Matrix3d& rest_basis,
-    const Matrix3d& basis,
-    const double length
-    )
+	const Vector3d &start,
+	const Matrix3d &rest_basis,
+	const Matrix3d &basis,
+	const double length)
 {
-	m_max_extension = start.norm() + length;	
+	m_max_extension = start.norm() + length;
 
 	m_start = start;
 	m_rest_basis = rest_basis;
@@ -107,11 +105,12 @@ void IK_QSegment::SetParent(IK_QSegment *parent)
 {
 	if (m_parent == parent)
 		return;
-	
+
 	if (m_parent)
 		m_parent->RemoveChild(this);
-	
-	if (parent) {
+
+	if (parent)
+	{
 		m_sibling = parent->m_child;
 		parent->m_child = this;
 	}
@@ -130,7 +129,8 @@ void IK_QSegment::RemoveChild(IK_QSegment *child)
 		return;
 	else if (m_child == child)
 		m_child = m_child->m_sibling;
-	else {
+	else
+	{
 		IK_QSegment *seg = m_child;
 
 		while (seg->m_sibling != child)
@@ -141,7 +141,7 @@ void IK_QSegment::RemoveChild(IK_QSegment *child)
 	}
 }
 
-void IK_QSegment::UpdateTransform(const Affine3d& global)
+void IK_QSegment::UpdateTransform(const Affine3d &global)
 {
 	// compute the global transform at the end of the segment
 	m_global_start = global.translation() + global.linear() * m_start;
@@ -155,7 +155,7 @@ void IK_QSegment::UpdateTransform(const Affine3d& global)
 		seg->UpdateTransform(m_global_transform);
 }
 
-void IK_QSegment::PrependBasis(const Matrix3d& mat)
+void IK_QSegment::PrependBasis(const Matrix3d &mat)
 {
 	m_basis = m_rest_basis.inverse() * mat * m_rest_basis * m_basis;
 }
@@ -186,8 +186,9 @@ void IK_QSphericalSegment::SetLimit(int axis, double lmin, double lmax)
 {
 	if (lmin > lmax)
 		return;
-	
-	if (axis == 1) {
+
+	if (axis == 1)
+	{
 		lmin = Clamp(lmin, -M_PI, M_PI);
 		lmax = Clamp(lmax, -M_PI, M_PI);
 
@@ -196,7 +197,8 @@ void IK_QSphericalSegment::SetLimit(int axis, double lmin, double lmax)
 
 		m_limit_y = true;
 	}
-	else {
+	else
+	{
 		// clamp and convert to axis angle parameters
 		lmin = Clamp(lmin, -M_PI, M_PI);
 		lmax = Clamp(lmax, -M_PI, M_PI);
@@ -204,12 +206,14 @@ void IK_QSphericalSegment::SetLimit(int axis, double lmin, double lmax)
 		lmin = sin(lmin * 0.5);
 		lmax = sin(lmax * 0.5);
 
-		if (axis == 0) {
+		if (axis == 0)
+		{
 			m_min[0] = -lmax;
 			m_max[0] = -lmin;
 			m_limit_x = true;
 		}
-		else if (axis == 2) {
+		else if (axis == 2)
+		{
 			m_min[1] = -lmax;
 			m_max[1] = -lmin;
 			m_limit_z = true;
@@ -223,26 +227,17 @@ void IK_QSphericalSegment::SetWeight(int axis, double weight)
 }
 
 // bool IK_QSphericalSegment::UpdateAngle(const IK_QJacobian &jacobian, Vector3d& delta, bool *clamp)
-bool IK_QSphericalSegment::UpdateAngle(const VectorXd &grad)
+bool IK_QSphericalSegment::UpdateAngle(const VectorXd &q)
 {
+
 	if (m_locked[0] && m_locked[1] && m_locked[2])
 		return false;
 
-	Vector3d dq;
-	// dq.x() = jacobian.AngleUpdate(m_DoF_id);
-	// dq.y() = jacobian.AngleUpdate(m_DoF_id + 1);
-	// dq.z() = jacobian.AngleUpdate(m_DoF_id + 2);
-	dq.x() = grad(m_DoF_id);
-	dq.y() = grad(m_DoF_id + 1);
-	dq.z() = grad(m_DoF_id + 2);
+	double theta = q.norm();
 
-	// Directly update the rotation matrix, with Rodrigues' rotation formula,
-	// to avoid singularities and allow smooth integration.
-
-	double theta = dq.norm();
-
-	if (!FuzzyZero(theta)) {
-		Vector3d w = dq * (1.0 / theta);
+	if (!FuzzyZero(theta))
+	{
+		Vector3d w = q * (1.0 / theta);
 
 		double sine = sin(theta);
 		double cosine = cos(theta);
@@ -260,32 +255,34 @@ bool IK_QSphericalSegment::UpdateAngle(const VectorXd &grad)
 		double zzcosine = w.z() * w.z() * cosineInv;
 
 		Matrix3d M = CreateMatrix(
-		    cosine + xxcosine, -zsine + xycosine, ysine + xzcosine,
-		    zsine + xycosine, cosine + yycosine, -xsine + yzcosine,
-		    -ysine + xzcosine, xsine + yzcosine, cosine + zzcosine);
+			cosine + xxcosine, -zsine + xycosine, ysine + xzcosine,
+			zsine + xycosine, cosine + yycosine, -xsine + yzcosine,
+			-ysine + xzcosine, xsine + yzcosine, cosine + zzcosine);
 
-		m_new_basis = m_basis * M;
+		m_basis = M;
 	}
 	else
-		m_new_basis = m_basis;
+	{
+		m_basis = CreateMatrix(
+			1, 0, 0, 0, 1, 0, 0, 0, 1);
+	}
 
-	
-	if (m_limit_y == false && m_limit_x == false && m_limit_z == false)
-		return false;
+	// if (m_limit_y == false && m_limit_x == false && m_limit_z == false)
+	// 	return false;
 
-	Vector3d a = SphericalRangeParameters(m_new_basis);
+	// Vector3d a = SphericalRangeParameters(m_new_basis);
 
-	if (m_locked[0])
-		a.x() = m_locked_ax;
-	if (m_locked[1])
-		a.y() = m_locked_ay;
-	if (m_locked[2])
-		a.z() = m_locked_az;
+	// if (m_locked[0])
+	// 	a.x() = m_locked_ax;
+	// if (m_locked[1])
+	// 	a.y() = m_locked_ay;
+	// if (m_locked[2])
+	// 	a.z() = m_locked_az;
 
-	double ax = a.x(), ay = a.y(), az = a.z();
+	// double ax = a.x(), ay = a.y(), az = a.z();
 
 	// clamp[0] = clamp[1] = clamp[2] =  false;
-	
+
 	// if (m_limit_y) {
 	// 	if (a.y() > m_max_y) {
 	// 		ay = m_max_y;
@@ -327,8 +324,8 @@ bool IK_QSphericalSegment::UpdateAngle(const VectorXd &grad)
 	// 		m_new_basis = ComputeSwingMatrix(ax, az) * ComputeTwistMatrix(ay);
 	// 	return false;
 	// }
-	
-	m_new_basis = ComputeSwingMatrix(ax, az) * ComputeTwistMatrix(ay);
+
+	// m_new_basis = ComputeSwingMatrix(ax, az) * ComputeTwistMatrix(ay);
 
 	// delta = MatrixToAxisAngle(m_basis.transpose() * m_new_basis);
 
@@ -339,17 +336,19 @@ bool IK_QSphericalSegment::UpdateAngle(const VectorXd &grad)
 
 	// if (!m_locked[1] && clamp[1])
 	// 	m_locked_ay = ay;
-	
+
 	return true;
 }
 
-void IK_QSphericalSegment::Lock(int dof, IK_QJacobian& jacobian, Vector3d& delta)
+void IK_QSphericalSegment::Lock(int dof, IK_QJacobian &jacobian, Vector3d &delta)
 {
-	if (dof == 1) {
+	if (dof == 1)
+	{
 		m_locked[1] = true;
 		jacobian.Lock(m_DoF_id + 1, delta[1]);
 	}
-	else {
+	else
+	{
 		m_locked[0] = m_locked[2] = true;
 		jacobian.Lock(m_DoF_id, delta[0]);
 		jacobian.Lock(m_DoF_id + 2, delta[2]);

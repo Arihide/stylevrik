@@ -76,6 +76,9 @@ class GPIK
 
     json11::Json skeleton;
 
+    // std::list<Vector3d> lts;
+    // std::list<Vector3d> gts;
+
     GPIK() {}
 
     // ロードしてIKツリー構築
@@ -105,6 +108,16 @@ class GPIK
         ifs.close();
 
     }
+
+    // void CreateSkeleton(int id, float lx, float ly, float lz, float gx, float gy, float gz){
+
+    //     Vector3d l(lx, ly, lz);
+    //     Vector3d g(gx, gy, gz);
+
+    //     lts.insert(id, l);
+    //     gts.insert(id, g);
+
+    // }
 
     void CreateRightSolver(){
 
@@ -189,7 +202,6 @@ class GPIK
         solvers.push_back(lsolver);
 
         m_ljacobian.ArmMatrices(lmatrows, 3);
-
     }
 
     IK_QSphericalSegment *CreateSegment(int id)
@@ -254,56 +266,13 @@ class GPIK
         lvtask->m_goal = vgoal;
     }
 
-    bool UpdateSegment(IK_QSegment *seg, double x, double y, double z)
-    {
-        Vector3d q(x, y, z);
-
-        // update the rotation matrix, with Rodrigues' rotation formula.
-
-        double theta = q.norm();
-
-        if (!FuzzyZero(theta))
-        {
-            Vector3d w = q * (1.0 / theta);
-
-            double sine = sin(theta);
-            double cosine = cos(theta);
-            double cosineInv = 1 - cosine;
-
-            double xsine = w.x() * sine;
-            double ysine = w.y() * sine;
-            double zsine = w.z() * sine;
-
-            double xxcosine = w.x() * w.x() * cosineInv;
-            double xycosine = w.x() * w.y() * cosineInv;
-            double xzcosine = w.x() * w.z() * cosineInv;
-            double yycosine = w.y() * w.y() * cosineInv;
-            double yzcosine = w.y() * w.z() * cosineInv;
-            double zzcosine = w.z() * w.z() * cosineInv;
-
-            Matrix3d M = CreateMatrix(
-                cosine + xxcosine, -zsine + xycosine, ysine + xzcosine,
-                zsine + xycosine, cosine + yycosine, -xsine + yzcosine,
-                -ysine + xzcosine, xsine + yzcosine, cosine + zzcosine);
-
-            seg->m_basis = M;
-        }
-        else
-        {
-            seg->m_basis = CreateMatrix(
-                1, 0, 0, 0, 1, 0, 0, 0, 1);
-        }
-
-        return false;
-    }
-
     double operator()(const VectorXd &x, VectorXd &x_grad)
     {
         double obj;
 
         for (auto i = segment_map.begin(); i != segment_map.end(); ++i)
         {
-            UpdateSegment(i->second, x(i->first * 3 + 0), x(i->first * 3 + 1), x(i->first * 3 + 2));
+            i->second->UpdateAngle(x.segment<3>(i->first * 3));
         }
 
         x_grad = VectorXd::Zero(m_gp.dim);

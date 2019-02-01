@@ -791,10 +791,10 @@ MonoBehaviour:
   RightHandTarget: {fileID: 180542776}
   HeadTarget: {fileID: 2128534305}
   SkeletonName: skeleton_reduced.json
-  GPModelName: Reach3_Char00_rmfinger_reduced_model_added.json
+  GPModelName: Scene_10_rmfinger_reduced_model_added.json
   Point: {fileID: 356233638}
   max_iterations: 300
-  IKWeight: 0.0002
+  IKWeight: 0.01
   useExample: 0
   frame: 30
 --- !u!114 &1716061827
@@ -1094,6 +1094,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.y
       value: -12
       objectReference: {fileID: 0}
+    - target: {fileID: 179998, guid: b9439223def16044d9db5d8b891a8390, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 11479990, guid: b9439223def16044d9db5d8b891a8390, type: 2}
   m_SourcePrefab: {fileID: 100100000, guid: b9439223def16044d9db5d8b891a8390, type: 2}
@@ -1114,7 +1118,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &1815715450
 MeshRenderer:
   m_ObjectHideFlags: 0
