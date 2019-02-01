@@ -12,4 +12,10 @@
 pipや本家のblender-mathutilsからではうまくいかなかった。
 https://gitlab.com/m1lhaus/blender-mathutils からダウンロードする。
 
+```conda env create --file stylevrik_env.yaml```
+
 ```conda activate stylevrik_env```
+
+
+学習
+```python learn.py bvh/(target bvh filename).bvh```
