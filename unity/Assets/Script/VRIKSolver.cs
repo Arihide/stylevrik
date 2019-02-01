@@ -57,6 +57,9 @@ public static class VRIKSolver
     public static extern float GetExampleAngle(IntPtr solver, int boneIndex, int angleIndex, int frame);
 
     [DllImport("VRIKSolver")]
+    public static extern float GetLearnedLatentVariable(IntPtr solver, int latentIndex, int index);
+
+    [DllImport("VRIKSolver")]
     public static extern float GetMeanAngle(IntPtr solver, int boneIndex, int angleIndex);
 
     [DllImport("VRIKSolver")]
@@ -64,5 +67,8 @@ public static class VRIKSolver
 
     [DllImport("VRIKSolver")]
     public static extern float GetLikelihood(IntPtr solver);
+
+    [DllImport("VRIKSolver")]
+    public static extern int GetNumberOfData(IntPtr solver);
 
 }
