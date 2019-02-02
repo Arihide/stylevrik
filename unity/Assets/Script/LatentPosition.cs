@@ -30,7 +30,12 @@ public class LatentPosition : MonoBehaviour
 
             var obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             obj.name = i.ToString();
-            obj.GetComponent<Renderer>().material.color = Color.blue;
+
+            Renderer r = obj.GetComponent<Renderer>();
+            r.material.color = Color.blue;
+            r.castShadows = false;
+            r.receiveShadows = false;
+            
             obj.transform.parent = this.transform;
             obj.transform.localPosition = point * 1.0f;
             // obj.transform.localScale = new Vector3(1, 1, 1) * (float)sigma * 2 * 20.0f;
@@ -45,10 +50,14 @@ public class LatentPosition : MonoBehaviour
 
         if(poseFromLatent){
 
+            avator.isOptimize = false;
+
             VRIKSolver.Predict(solver, Point.localPosition.x, Point.localPosition.y, Point.localPosition.z);
 
+        }else{
+            avator.isOptimize = true;
         }
-        
+
         Point.localPosition = new Vector3(
             VRIKSolver.GetLatentVariable(solver, 0),
             VRIKSolver.GetLatentVariable(solver, 1),

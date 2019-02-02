@@ -143,6 +143,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   avator: {fileID: 1716061826}
+  poseFromLatent: 1
   Point: {fileID: 2072894608}
   likelihood: {fileID: 1015066096}
 --- !u!23 &357220803
@@ -707,7 +708,7 @@ MonoBehaviour:
   RightHandTarget: {fileID: 1219080135}
   HeadTarget: {fileID: 0}
   SkeletonName: skeleton_reduced.json
-  GPModelName: swing_Char00_rmfinger_model_added.json
+  GPModelName: Scene_10_rmfinger_reduced_model_added.json
   max_iterations: 100
   IKWeight: 0.27
   useExample: 0

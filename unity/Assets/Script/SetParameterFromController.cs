@@ -22,7 +22,6 @@ public class SetParameterFromController : MonoBehaviour
     {
 
         Vector2 Rthumb = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick);
-        Vector2 Lthumb = OVRInput.Get(OVRInput.RawAxis2D.LThumbstick);
 
         if (Rthumb.x != 0.0f)
         {
@@ -34,27 +33,24 @@ public class SetParameterFromController : MonoBehaviour
 
             VRIKSolver.SetLambda(solver, aniava.IKWeight);
 
-        }
+            return;
 
-        if (Lthumb.x != 0.0f)
-        {
-
-            if (OVRInput.Get(OVRInput.RawAxis1D.LIndexTrigger) > 0.3f)
+            if (OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger) > 0.3f)
             {
                 kernel_variance = VRIKSolver.GetKernelVariance(solver);
 
-                kernel_variance += (double)Lthumb.x * 1e-2;
+                kernel_variance += (double)Rthumb.x * 1e-2;
 
                 if (kernel_variance < 0.0)
                     kernel_variance = 0.0;
 
                 VRIKSolver.SetKernelVariance(solver, kernel_variance);
             }
-            else if (OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.3f)
+            else if (OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.3f)
             {
                 gaussian_variance = VRIKSolver.GetGaussianVariance(solver);
 
-                gaussian_variance += (double)Lthumb.x * 1e-2;
+                gaussian_variance += (double)Rthumb.x * 1e-2;
 
                 if (gaussian_variance < 0.0)
                     gaussian_variance = 0.0;
@@ -65,7 +61,7 @@ public class SetParameterFromController : MonoBehaviour
             {
                 kernel_lengthscale = VRIKSolver.GetKernelLengthScale(solver);
 
-                kernel_lengthscale += (double)Lthumb.x * 1e-2;
+                kernel_lengthscale += (double)Rthumb.x * 1e-2;
 
                 if (kernel_lengthscale < 0.0)
                     kernel_lengthscale = 0.0;
@@ -73,8 +69,10 @@ public class SetParameterFromController : MonoBehaviour
                 VRIKSolver.SetKernelLengthScale(solver, kernel_lengthscale);
 
             }
-
         }
+
+
+        
 
     }
 

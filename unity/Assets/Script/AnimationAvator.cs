@@ -34,6 +34,7 @@ public class AnimationAvator : MonoBehaviour
 
     public float IKWeight = 0.01f;
 
+    public bool isOptimize = true;
     public bool useExample = false;
 
     [Range(0, 79)] public int frame = 30;
@@ -79,7 +80,8 @@ public class AnimationAvator : MonoBehaviour
         VRIKSolver.AddRightPositionGoal(solver, rgoal.x * 100, (rgoal.y + (initialHipPos.y - t.position.y)) * 100, rgoal.z * 100);
         VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, (lgoal.y + (initialHipPos.y - t.position.y)) * 100, lgoal.z * 100);
 
-        // VRIKSolver.Solve(solver);
+        if(isOptimize)
+            VRIKSolver.Solve(solver);
 
         // hips
         SetRotation(animator, HumanBodyBones.Hips, GetReceivedRotation(SkeletonBones.Hips));
@@ -150,11 +152,11 @@ public class AnimationAvator : MonoBehaviour
                 VRIKSolver.GetExampleAngle(solver, (int)neuronBones + 0, 2, frame)
             );
 
-            axis = new Vector3(
-                VRIKSolver.GetMeanAngle(solver, (int)neuronBones + 0, 0),
-                VRIKSolver.GetMeanAngle(solver, (int)neuronBones + 0, 1),
-                VRIKSolver.GetMeanAngle(solver, (int)neuronBones + 0, 2)
-            );
+            // axis = new Vector3(
+            //     VRIKSolver.GetMeanAngle(solver, (int)neuronBones + 0, 0),
+            //     VRIKSolver.GetMeanAngle(solver, (int)neuronBones + 0, 1),
+            //     VRIKSolver.GetMeanAngle(solver, (int)neuronBones + 0, 2)
+            // );
         }
 
         float angle = axis.magnitude;
