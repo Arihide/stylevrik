@@ -972,7 +972,7 @@ MonoBehaviour:
   RightHandTarget: {fileID: 180542776}
   HeadTarget: {fileID: 2128534305}
   SkeletonName: skeleton_reduced.json
-  GPModelName: Scene_10_rmfinger_reduced_model_added.json
+  GPModelName: swing_Char00_rmfinger_model_added.json
   max_iterations: 300
   IKWeight: 0.01
   useExample: 0

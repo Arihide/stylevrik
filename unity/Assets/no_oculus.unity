@@ -707,7 +707,7 @@ MonoBehaviour:
   RightHandTarget: {fileID: 1219080135}
   HeadTarget: {fileID: 0}
   SkeletonName: skeleton_reduced.json
-  GPModelName: Scene_10_rmfinger_reduced_model_added.json
+  GPModelName: swing_Char00_rmfinger_model_added.json
   max_iterations: 100
   IKWeight: 0.27
   useExample: 0

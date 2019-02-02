@@ -6,6 +6,8 @@ public class LatentPosition : MonoBehaviour
 {
 
     public AnimationAvator avator;
+    public bool poseFromLatent = false;
+
     public Transform Point;
     public Text likelihood;
 
@@ -41,6 +43,12 @@ public class LatentPosition : MonoBehaviour
     void Update()
     {
 
+        if(poseFromLatent){
+
+            VRIKSolver.Predict(solver, Point.localPosition.x, Point.localPosition.y, Point.localPosition.z);
+
+        }
+        
         Point.localPosition = new Vector3(
             VRIKSolver.GetLatentVariable(solver, 0),
             VRIKSolver.GetLatentVariable(solver, 1),
@@ -48,6 +56,7 @@ public class LatentPosition : MonoBehaviour
         );
 
         likelihood.text = VRIKSolver.GetLikelihood(solver).ToString();
+
 
     }
 

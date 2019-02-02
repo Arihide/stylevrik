@@ -34,23 +34,6 @@ public class AnimationAvator : MonoBehaviour
 
     public float IKWeight = 0.01f;
 
-    // private double kernel_lengthscale = 0.1;
-    // private double kernel_variance;
-    // private double gaussian_variance;
-
-    // public double KernelLengthScale
-    // {
-    //     get { return kernel_lengthscale; }
-    // }
-    // public double KernelVariance
-    // {
-    //     get { return kernel_variance; }
-    // }
-    // public double GaussianVariance
-    // {
-    //     get { return gaussian_variance; }
-    // }
-
     public bool useExample = false;
 
     [Range(0, 79)] public int frame = 30;
@@ -81,10 +64,6 @@ public class AnimationAvator : MonoBehaviour
 
         initialHipPos = animator.GetBoneTransform(HumanBodyBones.Hips).position;
 
-        // kernel_lengthscale = VRIKSolver.GetKernelLengthScale(solver);
-        // kernel_variance = VRIKSolver.GetKernelVariance(solver);
-        // gaussian_variance = VRIKSolver.GetGaussianVariance(solver);
-
         Debug.Log(VRIKSolver.GetLearnedLatentVariable(solver, 0, 0));
 
     }
@@ -100,58 +79,7 @@ public class AnimationAvator : MonoBehaviour
         VRIKSolver.AddRightPositionGoal(solver, rgoal.x * 100, (rgoal.y + (initialHipPos.y - t.position.y)) * 100, rgoal.z * 100);
         VRIKSolver.AddLeftPositionGoal(solver, lgoal.x * 100, (lgoal.y + (initialHipPos.y - t.position.y)) * 100, lgoal.z * 100);
 
-        // Vector2 Rthumb = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick);
-        // Vector2 Lthumb = OVRInput.Get(OVRInput.RawAxis2D.LThumbstick);
-
-        // if (Rthumb.x != 0.0f)
-        // {
-
-        //     IKWeight += Rthumb.x * 1e-2f;
-
-        //     if (IKWeight < 0.0f)
-        //         IKWeight = 0.0f;
-
-        //     VRIKSolver.SetLambda(solver, IKWeight);
-
-        // }
-
-        // if (Lthumb.x != 0.0f)
-        // {
-
-        //     if (OVRInput.Get(OVRInput.RawAxis1D.LIndexTrigger) > 0.3f)
-        //     {
-        //         kernel_variance += (double)Lthumb.x * 1e-2;
-
-        //         if (kernel_variance < 0.0)
-        //             kernel_variance = 0.0;
-
-        //         VRIKSolver.SetKernelVariance(solver, kernel_variance);
-        //     }
-        //     else if (OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.3f)
-        //     {
-        //         gaussian_variance += (double)Lthumb.x * 1e-2;
-
-        //         if (gaussian_variance < 0.0)
-        //             gaussian_variance = 0.0;
-
-        //         VRIKSolver.SetGaussianVariance(solver, gaussian_variance);
-        //     }
-        //     else
-        //     {
-
-        //         kernel_lengthscale += (double)Lthumb.x * 1e-2;
-
-        //         if (kernel_lengthscale < 0.0)
-        //             kernel_lengthscale = 0.0;
-
-        //         VRIKSolver.SetKernelLengthScale(solver, kernel_lengthscale);
-
-        //     }
-
-        // }
-
-        VRIKSolver.Solve(solver);
-
+        // VRIKSolver.Solve(solver);
 
         // hips
         SetRotation(animator, HumanBodyBones.Hips, GetReceivedRotation(SkeletonBones.Hips));

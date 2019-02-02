@@ -71,4 +71,6 @@ public static class VRIKSolver
     [DllImport("VRIKSolver")]
     public static extern int GetNumberOfData(IntPtr solver);
 
+    [DllImport("VRIKSolver")]
+    public static extern void Predict(IntPtr solver, float x, float y, float z);
 }
