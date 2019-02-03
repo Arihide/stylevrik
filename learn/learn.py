@@ -151,7 +151,10 @@ if __name__ == "__main__":
     # Y = Y[:, Y]
 
     # 角度０のところを削除
-    Y = np.delete(Y, [7, 8, 16, 17], axis=1)
+    # Y = np.delete(Y, [7, 8, 16, 17], axis=1)
+
+    # ルートも回転0
+    Y = np.delete(Y, [0, 1, 2, 7, 8, 16, 17], axis=1)
 
     Y = Y[::2]
 
