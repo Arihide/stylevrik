@@ -1,6 +1,9 @@
+# Style-based VRIK -Plugin
+
+## What is this?
+
 Unityで使われるdllに関するフォルダ
 
-実験しながらなのでかなり散らかっている。
 
 <!-- ### g++のコマンド
 g++ -Wall -I Eigen -fPIC -shared -O2 -o ../libEigen.so Eigen.cpp
