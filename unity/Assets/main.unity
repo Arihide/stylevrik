@@ -972,7 +972,7 @@ MonoBehaviour:
   RightHandTarget: {fileID: 180542776}
   HeadTarget: {fileID: 2128534305}
   SkeletonName: skeleton_reduced.json
-  GPModelName: swing_Char00_rmfinger_model_added.json
+  GPModelName: Scene_10_rmfinger_reduced_model_added.json
   max_iterations: 300
   IKWeight: 0.01
   isOptimize: 1
@@ -1301,7 +1301,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1815715449
 MonoBehaviour:
   m_ObjectHideFlags: 0

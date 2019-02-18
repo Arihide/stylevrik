@@ -28,6 +28,8 @@ def eulers_to_expmap(eulerArray):
 
             axis, angle = quat.to_axis_angle()
 
+            angle /= 2
+
             expmap = axis * angle
 
             # expmap = quat.to_exponential_map()
