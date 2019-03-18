@@ -26,16 +26,18 @@ public class SetParameterFromController : MonoBehaviour
         if (Rthumb.x != 0.0f)
         {
 
-            aniava.IKWeight += Rthumb.x * 1e-2f;
+            if (OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger) > 0.3f && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.3f)
+            {
+                gaussian_variance = VRIKSolver.GetGaussianVariance(solver);
 
-            if (aniava.IKWeight < 0.0f)
-                aniava.IKWeight = 0.0f;
+                gaussian_variance += (double)Rthumb.x * 1e-2;
 
-            VRIKSolver.SetLambda(solver, aniava.IKWeight);
+                if (gaussian_variance < 0.0)
+                    gaussian_variance = 0.0;
 
-            return;
-
-            if (OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger) > 0.3f)
+                VRIKSolver.SetGaussianVariance(solver, gaussian_variance);
+            }
+            else if (OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger) > 0.3f)
             {
                 kernel_variance = VRIKSolver.GetKernelVariance(solver);
 
@@ -48,17 +50,6 @@ public class SetParameterFromController : MonoBehaviour
             }
             else if (OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.3f)
             {
-                gaussian_variance = VRIKSolver.GetGaussianVariance(solver);
-
-                gaussian_variance += (double)Rthumb.x * 1e-2;
-
-                if (gaussian_variance < 0.0)
-                    gaussian_variance = 0.0;
-
-                VRIKSolver.SetGaussianVariance(solver, gaussian_variance);
-            }
-            else
-            {
                 kernel_lengthscale = VRIKSolver.GetKernelLengthScale(solver);
 
                 kernel_lengthscale += (double)Rthumb.x * 1e-2;
@@ -67,12 +58,19 @@ public class SetParameterFromController : MonoBehaviour
                     kernel_lengthscale = 0.0;
 
                 VRIKSolver.SetKernelLengthScale(solver, kernel_lengthscale);
+            }
+            else
+            {
+                aniava.IKWeight += Rthumb.x * 1e-2f;
+
+                if (aniava.IKWeight < 0.0f)
+                    aniava.IKWeight = 0.0f;
+
+                VRIKSolver.SetLambda(solver, aniava.IKWeight);
 
             }
+
         }
-
-
-        
 
     }
 
