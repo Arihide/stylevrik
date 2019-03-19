@@ -10,8 +10,6 @@ using Neuron;
 public class AnimationAvator : MonoBehaviour
 {
 
-    private Actor actor;
-
     private IntPtr solver;
 
     public IntPtr Solver
@@ -53,7 +51,6 @@ public class AnimationAvator : MonoBehaviour
             throw new FileNotFoundException();
         }
 
-        actor = GetComponent<Actor>();
         animator = GetComponent<Animator>();
 
         solver = VRIKSolver.Create(SkeletonPath, GPModelPath);
