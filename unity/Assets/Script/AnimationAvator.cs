@@ -7,6 +7,9 @@ using UnityEditor;
 
 using Neuron;
 
+/// <summary>
+/// DLLに手先のコントローラの位置を渡したり、最終的なアバターの姿勢を受け取って描画するプログラム
+/// </summary>
 public class AnimationAvator : MonoBehaviour
 {
 
